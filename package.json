@@ -12,8 +12,23 @@
     "lint:fix": "ng lint --fix", 
     "format": "prettier --write \"src/**/*.{ts,html,scss}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
+    "pre-push": "npm run test:ci && npm run build"
   },
+  "lint-staged": {
+    "src/**/*.{ts,html}": [
+      "eslint --fix", 
+      "prettier --write"
+    ],
+    "src/**/*.scss":[
+      "prettier --write"
+    ],
+    "src/**/*.{ts,html,scss}": [
+      "git add"
+    ]
+  },
+
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
