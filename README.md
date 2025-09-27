@@ -1,59 +1,101 @@
-# SyncupFrontend
+## SyncUp Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+> A modern Angular web application for collaborative task management, connecting to the SyncUp REST API for seamless team productivity.
 
-## Development server
+### 🌟 Overview
 
-To start a local development server, run:
+SyncUp Frontend is the client-side application for the SyncUp collaborative task management platform. Built with Angular 17+ and following modern development practices, it provides an intuitive interface for users to manage task lists, collaborate with team members, and track project progress in real-time.
 
-```bash
-ng serve
+#### Key Features (Planned)
+- **User Authentication** - Secure login and registration with JWT tokens
+- **Task Management** - Create, update, and organize tasks within lists
+- **Team Collaboration** - Invite collaborators and manage shared task lists
+- **Responsive Design** - Seamless experience across desktop, tablet, and mobile
+- **Modern UI/UX** - Clean, accessible interface with Angular Material components
+- **Real-time Updates** - Live synchronization of task changes (future enhancement)
+
+### 🏗️ Architecture & Tech Stack
+
+#### Frontend Stack
+- **Framework**: Angular 17+ with TypeScript
+- **Styling**: SCSS with Angular Material
+- **State Management**: RxJS with Angular Services
+- **HTTP Client**: Angular HttpClient for API communication
+- **Testing**: Jasmine, Karma, Angular Testing Library
+- **Build Tool**: Angular CLI with Webpack
+
+#### Backend Integration
+- **API**: RESTful API hosted on AWS Lightsail
+- **Authentication**: JWT-based token authentication
+- **Data Format**: JSON over HTTPS
+- **Base URL**: `http://3.71.52.212` (SyncUp API)
+
+### 🚀 CI/CD Pipeline Architecture
+
+Our deployment pipeline follows modern DevOps practices with multiple quality gates:
+
+```
+Developer Workflow:
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│   Local Dev     │    │   Git Hooks      │    │   GitHub Actions    │
+│                 │    │   (Husky)        │    │   Workflow          │
+│ • Code Changes  ├────┤                  ├────┤                     │
+│ • Local Testing │    │ • Pre-commit:    │    │ • Build & Test      │
+│ • SCSS Styling  │    │   - ESLint       │    │ • Security Audit    │
+│                 │    │   - Prettier     │    │ • Code Quality      │
+└─────────────────┘    │ • Pre-push:      │    │ • Deploy to S3      │
+                       │   - Unit Tests   │    │                     │
+                       │   - Build Check  │    │                     │
+                       └──────────────────┘    └─────────────────────┘
+                                                          │
+                                                          ▼
+                                               ┌─────────────────────┐
+                                               │   AWS S3 Bucket     │
+                                               │   Static Hosting    │
+                                               │                     │
+                                               │ • Angular Build     │
+                                               │ • CloudFront CDN    │
+                                               │ • Custom Domain     │
+                                               └─────────────────────┘
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+#### Quality Gates
+1. **Git Hooks** (Pre-commit/Pre-push)
+   - Code linting and formatting
+   - Unit test execution
+   - Build verification
 
-## Code scaffolding
+2. **GitHub Actions** (CI/CD)
+   - Multi-Node.js version testing
+   - Security vulnerability scanning
+   - Production build creation
+   - Automated deployment to AWS S3
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+3. **AWS Infrastructure**
+   - S3 static website hosting
+   - CloudFront CDN distribution (planned)
+   - Route 53 custom domain (planned)
 
-```bash
-ng generate component component-name
-```
+### 🌐 Deployment Strategy
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+#### Planned Infrastructure
+- **Frontend**: AWS S3 + CloudFront + Route 53
+- **Backend**: AWS Lightsail (already deployed)
+- **Domain**: Custom domain with SSL certificate
+- **Monitoring**: AWS CloudWatch integration
 
-```bash
-ng generate --help
-```
+### 🔗 Repository Structure
 
-## Building
+This frontend repository is maintained separately from the [SyncUp API](https://github.com/yourusername/syncup-backend) following a **polyrepo** architecture approach, allowing for:
+- Independent deployment cycles
+- Technology-specific tooling
+- Focused development teams
+- Cleaner separation of concerns
 
-To build the project run:
+### 👨‍💻 Author
 
-```bash
-ng build
-```
+**Mbonisi Mpala**
+- LinkedIn: [Mbonisi Mpala](https://www.linkedin.com/in/mbonisi-mpala/)
+- Backend API: [SyncUp REST API](https://github.com/mpalambonisi/syncup-backend)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
