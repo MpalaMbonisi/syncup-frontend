@@ -9,26 +9,32 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers+ChromeHeadless --code-coverage",
     "lint": "ng lint",
-    "lint:fix": "ng lint --fix", 
+    "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss}\"",
-    "prepare": "husky install",
+    "prepare": "husky",
     "pre-commit": "lint-staged",
     "pre-push": "npm run test:ci && npm run build"
   },
   "lint-staged": {
     "src/**/*.{ts,html}": [
-      "eslint --fix", 
+      "eslint --fix",
       "prettier --write"
     ],
-    "src/**/*.scss":[
+    "src/**/*.scss": [
       "prettier --write"
     ],
     "src/**/*.{ts,html,scss}": [
       "git add"
     ]
   },
-
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test:ci",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,

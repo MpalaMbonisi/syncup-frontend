@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running tests before push..."
+
+# Run tests
+npm run test:ci
+
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed! Push aborted."
+  exit 1
+fi
+
+echo "🚀 Building production build..."
+
+# Build the app
+npm run build
+
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed! Push aborted."
+  exit 1
+fi
+
+echo "✅ All checks passed! Proceeding with push..."
