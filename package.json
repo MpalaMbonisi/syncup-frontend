@@ -23,19 +23,8 @@
     ],
     "src/**/*.scss": [
       "prettier --write"
-    ],
-    "src/**/*.{ts,html,scss}": [
-      "git add"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run test:ci",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  
   "private": true,
   "dependencies": {
     "@angular/cdk": "^20.2.5",
@@ -54,6 +43,8 @@
     "@angular/build": "^20.3.2",
     "@angular/cli": "^20.3.2",
     "@angular/compiler-cli": "^20.3.0",
+    "@commitlint/cli": "^20.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@testing-library/angular": "^18.0.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/user-event": "^14.6.1",
