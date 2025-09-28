@@ -13,8 +13,7 @@
     "format": "prettier --write \"src/**/*.{ts,html,scss}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss}\"",
     "prepare": "husky",
-    "pre-commit": "lint-staged",
-    "pre-push": "npm run test:ci && npm run build"
+    "pre-commit": "lint-staged"
   },
   "lint-staged": {
     "src/**/*.{ts,html}": [
