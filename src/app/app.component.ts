@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { Register } from './features/auth/register/register';
+import { RegisterComponent } from './features/auth/register-component/register-component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [Register],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  imports: [RegisterComponent],
 })
 export class AppComponent {
   title = 'syncup-frontend';
