@@ -61,4 +61,38 @@ describe('RegisterComponent', () => {
   it('should mark form as invalid when fields are empty', () => {
     expect(component.registerForm.valid).toBeFalse();
   });
+
+  // Test #6
+  it('should mark form as valid when all fields are correctly filled', () => {
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'john.doe@yahoo.com',
+      password: 'StrongPassword1234',
+    });
+    expect(component.registerForm.valid).toBeTrue();
+  });
+
+  // Test #7
+  it('should show error messages for invalid fields when touched', () => {
+    const firstNameControl = component.registerForm.get('firstName');
+    const compiled = fixture.nativeElement;
+
+    // Mark as touched to trigger error display
+    firstNameControl?.markAsTouched();
+    fixture.detectChanges();
+
+    const errorMessage = compiled.querySelector('.error-message');
+    expect(errorMessage).toBeTruthy();
+    expect(errorMessage.textContent).toContain('First name is required');
+  });
+
+  // Test #8
+  it('should disable submit button when form is invalid', () => {
+    const compiled = fixture.nativeElement;
+    const submitButton = compiled.querySelector('button[type="submit"]');
+
+    expect(submitButton.disabled).toBeTrue();
+  });
 });
