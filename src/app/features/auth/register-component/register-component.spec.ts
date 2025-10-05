@@ -157,7 +157,7 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    const errorMessage = compiled.querySelector('.error-message-box');
+    const errorMessage = compiled.querySelector('.error-message');
 
     expect(errorMessage).toBeTruthy();
     expect(component.errorMessage).toBeTruthy();
