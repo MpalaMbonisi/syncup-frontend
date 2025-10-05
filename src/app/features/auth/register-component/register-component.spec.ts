@@ -48,4 +48,17 @@ describe('RegisterComponent', () => {
     expect(compiled.querySelector('#password')).toBeTruthy();
     expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
   });
+
+  // Test #4
+  it('should initialize form with empty values', () => {
+    expect(component.registerForm.get('firstName')?.value).toBe('');
+    expect(component.registerForm.get('lastName')?.value).toBe('');
+    expect(component.registerForm.get('username')?.value).toBe('');
+    expect(component.registerForm.get('email')?.value).toBe('');
+  });
+
+  // Test # 5
+  it('should mark form as invalid when fields are empty', () => {
+    expect(component.registerForm.valid).toBeFalse();
+  });
 });
