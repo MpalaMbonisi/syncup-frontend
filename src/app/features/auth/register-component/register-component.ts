@@ -25,5 +25,10 @@ export class RegisterComponent {
     });
   }
 
-  onSubmit() {}
+  onSubmit() {
+    if (this.registerForm.valid) {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }
+  }
 }
