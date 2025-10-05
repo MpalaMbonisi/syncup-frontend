@@ -3,22 +3,24 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register-component';
 // import { AuthService } from '../../../core/services/auth-service';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth-service';
+import { of } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
-  // let authService: jasmine.SpyObj<AuthService>;
+  let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     // Create a spy object for AuthService
-    // const authServiceSpy = jasmine.createSpyObj('AuthService', ['register']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['register']);
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent, ReactiveFormsModule],
-      // providers: [{provide: AuthService, useValue: authServiceSpy}]
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
 
-    // authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -94,5 +96,46 @@ describe('RegisterComponent', () => {
     const submitButton = compiled.querySelector('button[type="submit"]');
 
     expect(submitButton.disabled).toBeTrue();
+  });
+
+  // Test #9
+  it('should call onSubmit when form is submitted with valid data', () => {
+    spyOn(component, 'onSubmit');
+
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+    });
+
+    const compiled = fixture.nativeElement;
+    const form = compiled.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
+    expect(component.onSubmit).toHaveBeenCalled();
+  });
+
+  // Test #10
+  it('should display success message on successful registration', () => {
+    authService.register.and.returnValue(of({ message: 'User registered successfully!' }));
+
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const successMessage = compiled.querySelector('.success-message');
+
+    expect(successMessage).toBeTruthy();
+    expect(successMessage.textContent).toContain('Registration successful');
   });
 });
