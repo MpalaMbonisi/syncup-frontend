@@ -4,7 +4,7 @@ import { RegisterComponent } from './register-component';
 // import { AuthService } from '../../../core/services/auth-service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -137,5 +137,29 @@ describe('RegisterComponent', () => {
 
     expect(successMessage).toBeTruthy();
     expect(successMessage.textContent).toContain('Registration successful');
+  });
+
+  // Test #11
+  it('should display error message when registration fails', () => {
+    authService.register.and.returnValue(
+      throwError(() => ({ error: { message: ['Username already exists'] } }))
+    );
+
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const errorMessage = compiled.querySelector('.error-message-box');
+
+    expect(errorMessage).toBeTruthy();
+    expect(component.errorMessage).toBeTruthy();
   });
 });
