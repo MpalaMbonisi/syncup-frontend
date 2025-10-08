@@ -3,10 +3,11 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth-service';
+import { FooterComponent } from '../../../shared/components/footer-component/footer-component';
 
 @Component({
   selector: 'app-register-component',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent],
   templateUrl: './register-component.html',
   styleUrl: './register-component.scss',
 })
