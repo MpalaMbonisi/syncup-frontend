@@ -41,4 +41,88 @@ describe('LoginComponent', () => {
     expect(heading).toBeTruthy();
     expect(heading.textContent).toContain('Welcome Back');
   });
+
+  it('should have username and password fields', () => {
+    const compiled = fixture.nativeElement;
+
+    expect(compiled.querySelector('#username')).toBeTruthy();
+    expect(compiled.querySelector('#password')).toBeTruthy();
+    expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
+  });
+
+  it('should initialise form with empty values', () => {
+    expect(component.loginForm.get('username')?.value).toBe('');
+    expect(component.loginForm.get('password')?.value).toBe('');
+  });
+
+  it('should mark form as invalid when fields are empty', () => {
+    expect(component.loginForm.valid).toBeFalse();
+  });
+
+  it('should mark form as valid when both fields are filled correctly', () => {
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'StrongPassword1234',
+    });
+
+    expect(component.loginForm.valid).toBeTrue();
+  });
+
+  it('should show error when username is empty and touched', () => {
+    const usernameControl = component.loginForm.get('username');
+    const compiled = fixture.nativeElement;
+
+    usernameControl?.markAsTouched();
+    fixture.detectChanges();
+
+    const errorMessage = compiled.querySelector('.error-message');
+    expect(errorMessage).toBeTruthy();
+    expect(errorMessage.textContent).toContain('Username is required');
+  });
+
+  it('should show error when password is empty and touched', () => {
+    const passwordControl = component.loginForm.get('password');
+    const compiled = fixture.nativeElement;
+
+    passwordControl?.markAsTouched();
+    fixture.detectChanges();
+
+    const errorMessage = compiled.querySelector('.error-message');
+    expect(errorMessage).toBeTruthy();
+    expect(errorMessage.textContent).toContain('Password is required');
+  });
+
+  it('should show error when password is less than 8 characters', () => {
+    const passwordControl = component.loginForm.get('password');
+    const compiled = fixture.nativeElement;
+
+    component.loginForm.patchValue({ password: 'short' });
+    passwordControl?.markAsTouched();
+    fixture.detectChanges();
+
+    const errorMessage = compiled.querySelector('.error-message');
+    expect(errorMessage).toBeTruthy();
+    expect(errorMessage.textContent).toContain('Password must be at least 8 characters');
+  });
+
+  it('should disable submit button when form is invalid', () => {
+    const compiled = fixture.nativeElement;
+    const submitButton = compiled.querySelector('button[type="submit"]');
+
+    expect(submitButton.disabled).toBeTrue();
+  });
+
+  it('should enable submit button when form is valid', () => {
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'StrongPassword1234',
+    });
+
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const submitButton = compiled.querySelector('button[type="submit"]');
+
+    expect(submitButton.disabled).toBeFalse();
+  });
 });
