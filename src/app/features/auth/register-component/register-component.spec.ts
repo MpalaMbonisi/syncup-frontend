@@ -256,4 +256,15 @@ describe('RegisterComponent', () => {
     expect(errorMessage).toBeTruthy();
     expect(component.errorMessage).toBeTruthy();
   });
+
+  it('should display login prompt with link', () => {
+    const compiled = fixture.nativeElement;
+    const loginPrompt = compiled.querySelector('.login-prompt');
+    const loginLink = compiled.querySelector('.login-prompt a');
+
+    expect(loginPrompt).toBeTruthy();
+    expect(loginPrompt.textContent).toContain('Already have an account?');
+    expect(loginLink).toBeTruthy();
+    expect(loginLink.textContent).toContain('Log in here');
+  });
 });
