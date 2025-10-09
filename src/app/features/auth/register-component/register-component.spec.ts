@@ -111,6 +111,13 @@ describe('RegisterComponent', () => {
     expect(submitButton.disabled).toBeTrue();
   });
 
+  it('should disable submit button when form is invalid', () => {
+    const compiled = fixture.nativeElement;
+    const submitButton = compiled.querySelector('button[type="submit"]');
+
+    expect(submitButton.disabled).toBeTrue();
+  });
+
   it('should call onSubmit when form is submitted with valid data', () => {
     spyOn(component, 'onSubmit');
 
