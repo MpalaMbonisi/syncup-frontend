@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegisterComponent } from './register-component';
-// import { AuthService } from '../../../core/services/auth-service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
 import { of, throwError } from 'rxjs';
+import { provideRouter } from '@angular/router';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -17,7 +17,7 @@ describe('RegisterComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent, ReactiveFormsModule],
-      providers: [{ provide: AuthService, useValue: authServiceSpy }],
+      providers: [{ provide: AuthService, useValue: authServiceSpy }, provideRouter([])],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -40,7 +40,7 @@ describe('RegisterComponent', () => {
   });
 
   // Test #3
-  it('should have all required form fields', () => {
+  it('should have all required form fields including confirm password', () => {
     const compiled = fixture.nativeElement;
 
     expect(compiled.querySelector('#firstName')).toBeTruthy();
@@ -48,6 +48,7 @@ describe('RegisterComponent', () => {
     expect(compiled.querySelector('#username')).toBeTruthy();
     expect(compiled.querySelector('#email')).toBeTruthy();
     expect(compiled.querySelector('#password')).toBeTruthy();
+    expect(compiled.querySelector('#confirmPassword')).toBeTruthy();
     expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
   });
 
@@ -57,6 +58,8 @@ describe('RegisterComponent', () => {
     expect(component.registerForm.get('lastName')?.value).toBe('');
     expect(component.registerForm.get('username')?.value).toBe('');
     expect(component.registerForm.get('email')?.value).toBe('');
+    expect(component.registerForm.get('password')?.value).toBe('');
+    expect(component.registerForm.get('confirmPassword')?.value).toBe('');
   });
 
   // Test # 5
@@ -72,8 +75,27 @@ describe('RegisterComponent', () => {
       username: 'johndoe',
       email: 'john.doe@yahoo.com',
       password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
     });
     expect(component.registerForm.valid).toBeTrue();
+  });
+
+  // Test #12
+  it('should show error when passwords do not match', () => {
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'john.doe@yahoo.com',
+      password: 'StrongPassword1234',
+      confirmPassword: 'DifferentPassword1234',
+    });
+
+    component.registerForm.get('confirmPassword')?.markAsTouched();
+    fixture.detectChanges;
+
+    expect(component.registerForm.errors?.['passwordMismatch']).toBeTrue();
+    expect(component.registerForm.valid).toBeFalse();
   });
 
   // Test #7
