@@ -118,6 +118,57 @@ describe('RegisterComponent', () => {
     expect(submitButton.disabled).toBeTrue();
   });
 
+  it('should toggle password visibility', () => {
+    expect(component.showPassword).toBeFalse();
+
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeTrue();
+
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeFalse();
+  });
+
+  it('should toggle confirm password visibility', () => {
+    expect(component.showConfirmPassword).toBeFalse();
+
+    component.toggleConfirmPasswordVisibility();
+    expect(component.showConfirmPassword).toBeTrue();
+
+    component.toggleConfirmPasswordVisibility();
+    expect(component.showConfirmPassword).toBeFalse();
+  });
+
+  it('should change password input type when toggling visibility', () => {
+    const compiled = fixture.nativeElement;
+    const passwordInput = compiled.querySelector('#password');
+
+    expect(passwordInput.type).toBe('password');
+
+    component.togglePasswordVisibility();
+    fixture.detectChanges();
+
+    expect(passwordInput.type).toBe('text');
+  });
+
+  it('should change confirm password input type when toggling visibility', () => {
+    const compiled = fixture.nativeElement;
+    const confirmPasswordInput = compiled.querySelector('#confirmPassword');
+
+    expect(confirmPasswordInput.type).toBe('password');
+
+    component.toggleConfirmPasswordVisibility();
+    fixture.detectChanges();
+
+    expect(confirmPasswordInput.type).toBe('text');
+  });
+
+  it('should display password visibility toggle buttons', () => {
+    const compiled = fixture.nativeElement;
+    const toggleButtons = compiled.querySelectorAll('.toggle-password');
+
+    expect(toggleButtons.length).toBe(2);
+  });
+
   it('should call onSubmit when form is submitted with valid data', () => {
     spyOn(component, 'onSubmit');
 
