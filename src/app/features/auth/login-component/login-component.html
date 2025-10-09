@@ -27,6 +27,9 @@
           formControlName="password"
           [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
         />
+        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </button>
       </div>
       <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
         <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
