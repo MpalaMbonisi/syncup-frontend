@@ -1,0 +1,37 @@
+@import "../../../../styles/variables";
+
+.footer {
+  background-color: transparent;
+  padding: $spacing-lg 0;
+  margin-top: $spacing-xl;
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .footer-text {
+    text-align: center;
+    color: $text-secondary;
+    font-size: $font-sm;
+    margin: 0;
+
+    .heart {
+      color: $error-color;
+      margin: 0 $spacing-xs;
+    }
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: $font-medium;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+      }
+    }
+  }
+}
