@@ -220,6 +220,7 @@ describe('RegisterComponent', () => {
       username: 'johndoe',
       email: 'johndoe@yahoo.com',
       password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
     });
 
     component.onSubmit();
@@ -243,13 +244,14 @@ describe('RegisterComponent', () => {
       username: 'johndoe',
       email: 'johndoe@yahoo.com',
       password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
     });
 
     component.onSubmit();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    const errorMessage = compiled.querySelector('.error-message');
+    const errorMessage = compiled.querySelector('.error-message-box');
 
     expect(errorMessage).toBeTruthy();
     expect(component.errorMessage).toBeTruthy();
