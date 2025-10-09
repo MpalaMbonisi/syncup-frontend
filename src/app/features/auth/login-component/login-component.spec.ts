@@ -125,4 +125,34 @@ describe('LoginComponent', () => {
 
     expect(submitButton.disabled).toBeFalse();
   });
+
+  it('should toggle password visibility', () => {
+    expect(component.showPassword).toBeFalse();
+
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeTrue();
+
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeFalse();
+  });
+
+  it('should change password input type when toggling visibility', () => {
+    const compiled = fixture.nativeElement;
+    const passwordInput = compiled.querySelector('#password');
+
+    expect(passwordInput.type).toBe('password');
+
+    component.togglePasswordVisibility();
+    fixture.detectChanges();
+
+    expect(passwordInput.type).toBe('text');
+  });
+
+  it('should display password visibility toggle button', () => {
+    const compiled = fixture.nativeElement;
+    const toggleButton = compiled.querySelector('.toggle-password');
+
+    expect(toggleButton).toBeTruthy();
+    expect(toggleButton.textContent).toContain('Show');
+  });
 });
