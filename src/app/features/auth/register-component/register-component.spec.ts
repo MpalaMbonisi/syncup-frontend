@@ -26,12 +26,10 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
-  // Test #1
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test #2
   it('should display registration form title', () => {
     const compiled = fixture.nativeElement;
     const heading = compiled.querySelector('h2');
@@ -39,7 +37,6 @@ describe('RegisterComponent', () => {
     expect(heading.textContent).toContain('Create Account');
   });
 
-  // Test #3
   it('should have all required form fields including confirm password', () => {
     const compiled = fixture.nativeElement;
 
@@ -52,7 +49,6 @@ describe('RegisterComponent', () => {
     expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
   });
 
-  // Test #4
   it('should initialize form with empty values', () => {
     expect(component.registerForm.get('firstName')?.value).toBe('');
     expect(component.registerForm.get('lastName')?.value).toBe('');
@@ -62,12 +58,10 @@ describe('RegisterComponent', () => {
     expect(component.registerForm.get('confirmPassword')?.value).toBe('');
   });
 
-  // Test # 5
   it('should mark form as invalid when fields are empty', () => {
     expect(component.registerForm.valid).toBeFalse();
   });
 
-  // Test #6
   it('should mark form as valid when all fields are correctly filled', () => {
     component.registerForm.patchValue({
       firstName: 'John',
@@ -80,7 +74,6 @@ describe('RegisterComponent', () => {
     expect(component.registerForm.valid).toBeTrue();
   });
 
-  // Test #12
   it('should show error when passwords do not match', () => {
     component.registerForm.patchValue({
       firstName: 'John',
@@ -98,7 +91,6 @@ describe('RegisterComponent', () => {
     expect(component.registerForm.valid).toBeFalse();
   });
 
-  // Test #7
   it('should show error messages for invalid fields when touched', () => {
     const firstNameControl = component.registerForm.get('firstName');
     const compiled = fixture.nativeElement;
@@ -112,7 +104,6 @@ describe('RegisterComponent', () => {
     expect(errorMessage.textContent).toContain('First name is required');
   });
 
-  // Test #8
   it('should disable submit button when form is invalid', () => {
     const compiled = fixture.nativeElement;
     const submitButton = compiled.querySelector('button[type="submit"]');
@@ -120,7 +111,6 @@ describe('RegisterComponent', () => {
     expect(submitButton.disabled).toBeTrue();
   });
 
-  // Test #9
   it('should call onSubmit when form is submitted with valid data', () => {
     spyOn(component, 'onSubmit');
 
@@ -139,7 +129,6 @@ describe('RegisterComponent', () => {
     expect(component.onSubmit).toHaveBeenCalled();
   });
 
-  // Test #10
   it('should display success message on successful registration', () => {
     authService.register.and.returnValue(of({ message: 'User registered successfully!' }));
 
@@ -161,7 +150,6 @@ describe('RegisterComponent', () => {
     expect(successMessage.textContent).toContain('Registration successful');
   });
 
-  // Test #11
   it('should display error message when registration fails', () => {
     authService.register.and.returnValue(
       throwError(() => ({ error: { message: ['Username already exists'] } }))
