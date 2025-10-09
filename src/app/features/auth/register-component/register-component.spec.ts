@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
 import { of, throwError } from 'rxjs';
 import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -288,5 +289,12 @@ describe('RegisterComponent', () => {
     expect(component.registerForm.get('email')?.value).toBeNull();
     expect(component.registerForm.get('password')?.value).toBeNull();
     expect(component.registerForm.get('confirmPassword')?.value).toBeNull();
+  });
+
+  it('should display the footer component', () => {
+    const footerElement = fixture.debugElement.query(By.css('app-footer-component'));
+
+    expect(footerElement).not.toBeNull();
+    expect(footerElement).toBeTruthy();
   });
 });
