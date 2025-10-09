@@ -267,4 +267,26 @@ describe('RegisterComponent', () => {
     expect(loginLink).toBeTruthy();
     expect(loginLink.textContent).toContain('Log in here');
   });
+
+  it('should reset form after successful registration', () => {
+    authService.register.and.returnValue(of({ message: 'User registered successfully' }));
+
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+
+    expect(component.registerForm.get('firstName')?.value).toBeNull();
+    expect(component.registerForm.get('lastName')?.value).toBeNull();
+    expect(component.registerForm.get('username')?.value).toBeNull();
+    expect(component.registerForm.get('email')?.value).toBeNull();
+    expect(component.registerForm.get('password')?.value).toBeNull();
+    expect(component.registerForm.get('confirmPassword')?.value).toBeNull();
+  });
 });
