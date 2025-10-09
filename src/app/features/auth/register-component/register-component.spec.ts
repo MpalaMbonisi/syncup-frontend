@@ -178,6 +178,7 @@ describe('RegisterComponent', () => {
       username: 'johndoe',
       email: 'johndoe@yahoo.com',
       password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
     });
 
     const compiled = fixture.nativeElement;
@@ -185,6 +186,29 @@ describe('RegisterComponent', () => {
     form.dispatchEvent(new Event('submit'));
 
     expect(component.onSubmit).toHaveBeenCalled();
+  });
+
+  it('should not include confirmPassword in registration payload', () => {
+    authService.register.and.returnValue(of({ message: 'User registered successfully' }));
+
+    component.registerForm.patchValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+      confirmPassword: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+
+    expect(authService.register).toHaveBeenCalledWith({
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johndoe@yahoo.com',
+      password: 'StrongPassword1234',
+    });
   });
 
   it('should display success message on successful registration', () => {
