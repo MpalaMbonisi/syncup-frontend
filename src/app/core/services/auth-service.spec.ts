@@ -71,7 +71,7 @@ describe('AuthService', () => {
       it('should login a user successfully', () => {
         const mockCredentials = {
           username: 'johndoe',
-          password: 'password123',
+          password: 'StrongPassword1234',
         };
 
         const mockResponse = { token: 'mock-jwt-token-12345' };
@@ -85,6 +85,26 @@ describe('AuthService', () => {
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toEqual(mockCredentials);
         req.flush(mockResponse);
+      });
+
+      it('should handle login error with invalid credentials', () => {
+        const mockCredentials = {
+          username: 'johndoe',
+          password: 'wrongPassword',
+        };
+
+        const mockError = { message: 'Invalid credentials' };
+
+        service.login(mockCredentials).subscribe({
+          next: () => fail('should have failed with 401 error'),
+          error: error => {
+            expect(error.status).toBe(401);
+            expect(error.error).toEqual(mockError);
+          },
+        });
+
+        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+        req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
       });
     });
   });
