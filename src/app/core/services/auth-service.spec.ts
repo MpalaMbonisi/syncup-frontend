@@ -106,6 +106,26 @@ describe('AuthService', () => {
         const req = httpMock.expectOne('http://3.71.52.212/auth/login');
         req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
       });
+
+      it('should handle login error with non-existent user', () => {
+        const mockCredentials = {
+          username: 'non-existent',
+          password: 'StrongPassword1234',
+        };
+
+        const mockError = { message: 'Username does not exist' };
+
+        service.login(mockCredentials).subscribe({
+          next: () => fail('should have failed with 404 error'),
+          error: error => {
+            expect(error.status).toBe(404);
+            expect(error.error).toEqual(mockError);
+          },
+        });
+
+        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+        req.flush(mockError, { status: 404, statusText: 'Not Found' });
+      });
     });
   });
 });
