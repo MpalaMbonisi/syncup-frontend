@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoginComponent } from './login-component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth-service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -10,13 +11,13 @@ describe('LoginComponent', () => {
   // let router: jasmine.SpyObj<Router>
 
   beforeEach(async () => {
-    // const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
     // const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule],
       providers: [
-        // {provide: AuthService, useValue: authServiceSpy},
+        { provide: AuthService, useValue: authServiceSpy },
         // {provide: Router, useValue: routerSpy},
         // provideRouter([]),
       ],
@@ -154,5 +155,20 @@ describe('LoginComponent', () => {
 
     expect(toggleButton).toBeTruthy();
     expect(toggleButton.textContent).toContain('Show');
+  });
+
+  it('should call onSubmit when form is submitted with valid data', () => {
+    spyOn(component, 'onSubmit');
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'password1234',
+    });
+
+    const compiled = fixture.nativeElement;
+    const form = compiled.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
+    expect(component.onSubmit).toHaveBeenCalled();
   });
 });
