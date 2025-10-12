@@ -61,6 +61,9 @@ describe('AuthService', () => {
             expect(error.error).toEqual(mockError);
           },
         });
+
+        const req = httpMock.expectOne('http://3.71.52.212/auth/register');
+        req.flush(mockError, { status: 409, statusText: 'Conflict' });
       });
     });
   });
