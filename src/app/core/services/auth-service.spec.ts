@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { AuthService } from './auth-service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -36,96 +35,98 @@ describe('AuthService', () => {
 
       const mockResponse = { message: 'User registered successfully!' };
 
+      service.register(mockUser).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
       const req = httpMock.expectOne('http://3.71.52.212/auth/register');
-      service.register(mockUser).subscribe(() => {
-        expect(req.request.method).toBe('POST');
-        expect(req.request.body).toEqual(mockUser);
-        req.flush(mockResponse);
-      });
-
-      it('should handle registration error', () => {
-        const mockUser = {
-          firstName: 'John',
-          lastName: 'Doe',
-          username: 'johndoe',
-          email: 'johndoe@yahoo.com',
-          password: 'StrongPassword1234',
-        };
-
-        const mockError = { message: 'Username already exists' };
-
-        service.register(mockUser).subscribe({
-          next: () => fail('should have failed with 409 error'),
-          error: error => {
-            expect(error.status).toBe(409);
-            expect(error.error).toEqual(mockError);
-          },
-        });
-
-        const req = httpMock.expectOne('http://3.71.52.212/auth/register');
-        req.flush(mockError, { status: 409, statusText: 'Conflict' });
-      });
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(mockUser);
+      req.flush(mockResponse);
     });
 
-    describe('login', () => {
-      it('should login a user successfully', () => {
-        const mockCredentials = {
-          username: 'johndoe',
-          password: 'StrongPassword1234',
-        };
+    it('should handle registration error', () => {
+      const mockUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        username: 'johndoe',
+        email: 'johndoe@yahoo.com',
+        password: 'StrongPassword1234',
+      };
 
-        const mockResponse = { token: 'mock-jwt-token-12345' };
+      const mockError = { message: 'Username already exists' };
 
-        service.login(mockCredentials).subscribe(response => {
-          expect(response).toEqual(mockResponse);
-          expect(response.token).toBe('mock-jwt-token-12345');
-        });
-
-        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
-        expect(req.request.method).toBe('POST');
-        expect(req.request.body).toEqual(mockCredentials);
-        req.flush(mockResponse);
+      service.register(mockUser).subscribe({
+        next: () => fail('should have failed with 409 error'),
+        error: error => {
+          expect(error.status).toBe(409);
+          expect(error.error).toEqual(mockError);
+        },
       });
 
-      it('should handle login error with invalid credentials', () => {
-        const mockCredentials = {
-          username: 'johndoe',
-          password: 'wrongPassword',
-        };
+      const req = httpMock.expectOne('http://3.71.52.212/auth/register');
+      req.flush(mockError, { status: 409, statusText: 'Conflict' });
+    });
+  });
 
-        const mockError = { message: 'Invalid credentials' };
+  describe('login', () => {
+    it('should login a user successfully', () => {
+      const mockCredentials = {
+        username: 'johndoe',
+        password: 'password123',
+      };
 
-        service.login(mockCredentials).subscribe({
-          next: () => fail('should have failed with 401 error'),
-          error: error => {
-            expect(error.status).toBe(401);
-            expect(error.error).toEqual(mockError);
-          },
-        });
+      const mockResponse = { token: 'fake-jwt-token-12345' };
 
-        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
-        req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
+      service.login(mockCredentials).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.token).toBe('fake-jwt-token-12345');
       });
 
-      it('should handle login error with non-existent user', () => {
-        const mockCredentials = {
-          username: 'non-existent',
-          password: 'StrongPassword1234',
-        };
+      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(mockCredentials);
+      req.flush(mockResponse);
+    });
 
-        const mockError = { message: 'Username does not exist' };
+    it('should handle login error with invalid credentials', () => {
+      const mockCredentials = {
+        username: 'johndoe',
+        password: 'wrongpassword',
+      };
 
-        service.login(mockCredentials).subscribe({
-          next: () => fail('should have failed with 404 error'),
-          error: error => {
-            expect(error.status).toBe(404);
-            expect(error.error).toEqual(mockError);
-          },
-        });
+      const mockError = { message: 'Invalid credentials' };
 
-        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
-        req.flush(mockError, { status: 404, statusText: 'Not Found' });
+      service.login(mockCredentials).subscribe({
+        next: () => fail('should have failed with 401 error'),
+        error: error => {
+          expect(error.status).toBe(401);
+          expect(error.error).toEqual(mockError);
+        },
       });
+
+      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
+    });
+
+    it('should handle login error with non-existent user', () => {
+      const mockCredentials = {
+        username: 'nonexistent',
+        password: 'password123',
+      };
+
+      const mockError = { message: 'Username does not exist' };
+
+      service.login(mockCredentials).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
     });
   });
 });
