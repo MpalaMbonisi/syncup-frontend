@@ -3,11 +3,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
+import { of } from 'rxjs';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  // let authService: jasmine.SpyObj<AuthService>;
+  let authService: jasmine.SpyObj<AuthService>;
   // let router: jasmine.SpyObj<Router>
 
   beforeEach(async () => {
@@ -23,7 +24,7 @@ describe('LoginComponent', () => {
       ],
     }).compileComponents();
 
-    // authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     // router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     fixture = TestBed.createComponent(LoginComponent);
@@ -170,5 +171,21 @@ describe('LoginComponent', () => {
     form.dispatchEvent(new Event('submit'));
 
     expect(component.onSubmit).toHaveBeenCalled();
+  });
+
+  it('should call authService.login with correct credentials', () => {
+    authService.login.and.returnValue(of({ token: 'mock-jwt-token-12345' }));
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'PasswordStrong1234',
+    });
+
+    component.onSubmit();
+
+    expect(authService.login).toHaveBeenCalledWith({
+      username: 'johndoe',
+      password: 'PasswordStrong1234',
+    });
   });
 });
