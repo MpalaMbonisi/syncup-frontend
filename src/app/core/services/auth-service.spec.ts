@@ -66,5 +66,26 @@ describe('AuthService', () => {
         req.flush(mockError, { status: 409, statusText: 'Conflict' });
       });
     });
+
+    describe('login', () => {
+      it('should login a user successfully', () => {
+        const mockCredentials = {
+          username: 'johndoe',
+          password: 'password123',
+        };
+
+        const mockResponse = { token: 'mock-jwt-token-12345' };
+
+        service.login(mockCredentials).subscribe(response => {
+          expect(response).toEqual(mockResponse);
+          expect(response.token).toBe('mock-jwt-token-12345');
+        });
+
+        const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+        expect(req.request.method).toBe('POST');
+        expect(req.request.body).toEqual(mockCredentials);
+        req.flush(mockResponse);
+      });
+    });
   });
 });
