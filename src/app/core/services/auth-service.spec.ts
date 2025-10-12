@@ -42,6 +42,26 @@ describe('AuthService', () => {
         expect(req.request.body).toEqual(mockUser);
         req.flush(mockResponse);
       });
+
+      it('should handle registration error', () => {
+        const mockUser = {
+          firstName: 'John',
+          lastName: 'Doe',
+          username: 'johndoe',
+          email: 'johndoe@yahoo.com',
+          password: 'StrongPassword1234',
+        };
+
+        const mockError = { message: 'Username already exists' };
+
+        service.register(mockUser).subscribe({
+          next: () => fail('should have failed with 409 error'),
+          error: error => {
+            expect(error.status).toBe(409);
+            expect(error.error).toEqual(mockError);
+          },
+        });
+      });
     });
   });
 });
