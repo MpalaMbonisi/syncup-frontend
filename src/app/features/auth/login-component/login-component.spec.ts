@@ -291,4 +291,15 @@ describe('LoginComponent', () => {
     expect(footerElement).not.toBeNull();
     expect(footerElement).toBeTruthy();
   });
+
+  it('should not call authService.login if form is invalid', () => {
+    component.loginForm.patchValue({
+      username: '',
+      password: '',
+    });
+
+    component.onSubmit();
+
+    expect(authService.login).not.toHaveBeenCalled();
+  });
 });
