@@ -85,7 +85,7 @@ describe('AuthService', () => {
         expect(response.token).toBe('fake-jwt-token-12345');
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`);
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockCredentials);
       req.flush(mockResponse);

@@ -28,7 +28,7 @@ export interface LoginResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrl}/auth`;
   private http: HttpClient = inject(HttpClient);
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {
