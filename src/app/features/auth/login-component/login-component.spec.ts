@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { ERROR_MESSAGES, VALIDATION } from '../../../core/constants/app.constants';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -95,7 +96,7 @@ describe('LoginComponent', () => {
     expect(errorMessage.textContent).toContain('Password is required');
   });
 
-  it('should show error when password is less than 8 characters', () => {
+  it(`should show error when password is less than ${VALIDATION.PASSWORD_MIN_LENGTH} characters`, () => {
     const passwordControl = component.loginForm.get('password');
     const compiled = fixture.nativeElement;
 
@@ -105,7 +106,9 @@ describe('LoginComponent', () => {
 
     const errorMessage = compiled.querySelector('.error-message');
     expect(errorMessage).toBeTruthy();
-    expect(errorMessage.textContent).toContain('Password must be at least 8 characters');
+    expect(errorMessage.textContent).toContain(
+      `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`
+    );
   });
 
   it('should disable submit button when form is invalid', () => {
@@ -234,7 +237,7 @@ describe('LoginComponent', () => {
 
     component.onSubmit();
 
-    expect(component.errorMessage).toBe('Login failed. Please check your credentials.');
+    expect(component.errorMessage).toBe(ERROR_MESSAGES.LOGIN_FAILED);
   });
 
   it('should handle array of error messages', () => {

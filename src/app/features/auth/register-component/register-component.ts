@@ -4,6 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth-service';
 import { FooterComponent } from '../../../shared/components/footer-component/footer-component';
+import {
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+  VALIDATION,
+} from '../../../core/constants/app.constants';
 
 @Component({
   selector: 'app-register-component',
@@ -28,7 +33,7 @@ export class RegisterComponent {
         lastName: ['', Validators.required],
         username: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8)]],
+        password: ['', [Validators.required, Validators.minLength(VALIDATION.PASSWORD_MIN_LENGTH)]],
         confirmPassword: ['', Validators.required],
       },
       { validators: this.passwordMatchValidator }
@@ -64,7 +69,7 @@ export class RegisterComponent {
 
       this.authService.register(userData).subscribe({
         next: () => {
-          this.successMessage = 'Registration successful! You can now log in.';
+          this.successMessage = SUCCESS_MESSAGES.REGISTRATION_SUCCESS;
           this.registerForm.reset();
         },
         error: error => {
@@ -73,7 +78,7 @@ export class RegisterComponent {
               ? error.error.message.join(', ')
               : error.error.message;
           } else {
-            this.errorMessage = 'Registration failed. Please try again.';
+            this.errorMessage = ERROR_MESSAGES.REGISTRATION_FAILED;
           }
         },
       });

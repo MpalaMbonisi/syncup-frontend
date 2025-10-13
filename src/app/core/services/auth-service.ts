@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface RegisterRequest {
   firstName: string;
@@ -27,7 +28,7 @@ export interface LoginResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://3.71.52.212/auth';
+  private apiUrl = `${environment.apiUrl}`;
   private http: HttpClient = inject(HttpClient);
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {

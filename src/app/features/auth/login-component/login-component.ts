@@ -22,7 +22,7 @@ export class LoginComponent {
   constructor() {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(VALIDATION.PASSWORD_MIN_LENGTH)]],
     });
   }
 
@@ -37,9 +37,9 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: response => {
           // store token in localStorage
-          localStorage.setItem('token', response.token);
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
           // navigate to home
-          // this.router.nagivate(['/home']);
+          // this.router.nagivate([ROUTES.DASHBOARD]);
         },
         error: error => {
           if (error.error && error.error.message) {
@@ -47,7 +47,7 @@ export class LoginComponent {
               ? error.error.message.join(', ')
               : error.error.message;
           } else {
-            this.errorMessage = 'Login failed. Please check your credentials.';
+            this.errorMessage = ERROR_MESSAGES.LOGIN_FAILED;
           }
         },
       });

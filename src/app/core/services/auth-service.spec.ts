@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth-service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../constants/app.constants';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -39,7 +41,7 @@ describe('AuthService', () => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne('http://3.71.52.212/auth/register');
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockUser);
       req.flush(mockResponse);
@@ -64,7 +66,7 @@ describe('AuthService', () => {
         },
       });
 
-      const req = httpMock.expectOne('http://3.71.52.212/auth/register');
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`);
       req.flush(mockError, { status: 409, statusText: 'Conflict' });
     });
   });
@@ -83,7 +85,7 @@ describe('AuthService', () => {
         expect(response.token).toBe('fake-jwt-token-12345');
       });
 
-      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockCredentials);
       req.flush(mockResponse);
@@ -105,7 +107,7 @@ describe('AuthService', () => {
         },
       });
 
-      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`);
       req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
     });
 
@@ -125,7 +127,7 @@ describe('AuthService', () => {
         },
       });
 
-      const req = httpMock.expectOne('http://3.71.52.212/auth/login');
+      const req = httpMock.expectOne(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`);
       req.flush(mockError, { status: 404, statusText: 'Not Found' });
     });
   });
