@@ -272,4 +272,15 @@ describe('LoginComponent', () => {
 
     expect(component.errorMessage).toBe('');
   });
+
+  it('should display register prompt with link', () => {
+    const compiled = fixture.nativeElement;
+    const registerPrompt = compiled.querySelector('.register-prompt');
+    const registerLink = compiled.querySelector('.register-prompt a');
+
+    expect(registerPrompt).toBeTruthy();
+    expect(registerPrompt.textContent).toContain("Don't have an account");
+    expect(registerLink).toBeTruthy();
+    expect(registerLink.textContent).toContain('Register here');
+  });
 });
