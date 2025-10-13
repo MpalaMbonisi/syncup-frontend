@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -201,5 +201,75 @@ describe('LoginComponent', () => {
     component.onSubmit();
 
     expect(localStorage.setItem).toHaveBeenCalledWith('token', 'mock-jwt-token-12345');
+  });
+
+  it('should display error message when login fails', () => {
+    authService.login.and.returnValue(
+      throwError(() => ({ error: { message: 'Invalid credentials' } }))
+    );
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'wrongPassword1234',
+    });
+
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement;
+    const errorMessage = compiled.querySelector('.error-message-box');
+
+    expect(errorMessage).toBeTruthy();
+    expect(component.errorMessage).toBe('Invalid credentials');
+  });
+
+  it('should display generic error message when error format is unexpected', () => {
+    authService.login.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+
+    expect(component.errorMessage).toBe('Login failed. Please check your credentials.');
+  });
+
+  it('should handle array of error messages', () => {
+    authService.login.and.returnValue(
+      throwError(() => ({ error: { message: ['Error 1', 'Error 2'] } }))
+    );
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'StrongPassword1234',
+    });
+
+    component.onSubmit();
+
+    expect(component.errorMessage).toBe('Error 1, Error 2');
+  });
+
+  it('should clear error message on new submission attempt', () => {
+    authService.login.and.returnValue(
+      throwError(() => ({ error: { message: 'Invalid credentials' } }))
+    );
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'WrongPassword',
+    });
+
+    component.onSubmit();
+    expect(component.errorMessage).toBeTruthy();
+
+    // Make it succeed
+    authService.login.and.returnValue(of({ token: 'mock-jwt-token-12345' }));
+    component.loginForm.patchValue({ password: 'StrongPassword123' });
+
+    component.onSubmit();
+
+    expect(component.errorMessage).toBe('');
   });
 });
