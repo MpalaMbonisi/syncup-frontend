@@ -188,4 +188,18 @@ describe('LoginComponent', () => {
       password: 'PasswordStrong1234',
     });
   });
+
+  it('should store token in localStorage on successful login', () => {
+    spyOn(localStorage, 'setItem');
+    authService.login.and.returnValue(of({ token: 'mock-jwt-token-12345' }));
+
+    component.loginForm.patchValue({
+      username: 'johndoe',
+      password: 'PasswordStrong1234',
+    });
+
+    component.onSubmit();
+
+    expect(localStorage.setItem).toHaveBeenCalledWith('token', 'mock-jwt-token-12345');
+  });
 });
