@@ -28,7 +28,7 @@ SyncUp Frontend is the client-side application for the SyncUp collaborative task
 - **API**: RESTful API hosted on AWS Lightsail
 - **Authentication**: JWT-based token authentication
 - **Data Format**: JSON over HTTPS
-- **Base URL**: `http://3.71.52.212` (SyncUp API)
+- **Base URL**: `http://63.176.102.7` (SyncUp API)
 
 ### 🚀 CI/CD Pipeline Architecture
 
