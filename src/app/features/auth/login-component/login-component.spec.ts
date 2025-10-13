@@ -4,6 +4,7 @@ import { LoginComponent } from './login-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
 import { of, throwError } from 'rxjs';
+import { By } from '@angular/platform-browser';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -282,5 +283,12 @@ describe('LoginComponent', () => {
     expect(registerPrompt.textContent).toContain("Don't have an account");
     expect(registerLink).toBeTruthy();
     expect(registerLink.textContent).toContain('Register here');
+  });
+
+  it('should display the footer component', () => {
+    const footerElement = fixture.debugElement.query(By.css('app-footer-component'));
+
+    expect(footerElement).not.toBeNull();
+    expect(footerElement).toBeTruthy();
   });
 });
