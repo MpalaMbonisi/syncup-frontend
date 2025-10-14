@@ -7,7 +7,7 @@ import {
 } from '@angular/router';
 
 import { authGuard } from './auth-guard';
-import { STORAGE_KEYS } from '../constants/app.constants';
+import { ROUTES, STORAGE_KEYS } from '../constants/app.constants';
 
 describe('authGuard', () => {
   let router: jasmine.SpyObj<Router>;
@@ -43,5 +43,36 @@ describe('authGuard', () => {
 
     expect(result).toBeTrue();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should deny access and redirect to login when token does not exist', () => {
+    const result = TestBed.runInInjectionContext(() => {
+      return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
+    });
+
+    expect(result).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+  });
+
+  it('should deny access when token is null', () => {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+
+    const result = TestBed.runInInjectionContext(() => {
+      return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
+    });
+
+    expect(result).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+  });
+
+  it('should deny acces when token is empty string', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, '');
+
+    const result = TestBed.runInInjectionContext(() => {
+      return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
+    });
+
+    expect(result).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
   });
 });
