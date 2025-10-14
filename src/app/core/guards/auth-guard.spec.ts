@@ -75,4 +75,15 @@ describe('authGuard', () => {
     expect(result).toBeFalse();
     expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
   });
+
+  it('should allow access with valid token format', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+
+    const result = TestBed.runInInjectionContext(() => {
+      return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
+    });
+
+    expect(result).toBeTrue();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
 });
