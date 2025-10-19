@@ -6,6 +6,8 @@ import { AuthService } from '../../../core/services/auth-service';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { ERROR_MESSAGES, VALIDATION } from '../../../core/constants/app.constants';
+import { provideRouter } from '@angular/router';
+import { RegisterComponent } from '../register-component/register-component';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -22,7 +24,10 @@ describe('LoginComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         // {provide: Router, useValue: routerSpy},
-        // provideRouter([]),
+        provideRouter([
+          { path: 'register', component: RegisterComponent },
+          { path: 'login', component: RegisterComponent }, // Mock route
+        ]),
       ],
     }).compileComponents();
 
