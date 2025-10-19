@@ -59,4 +59,20 @@ describe('DashboardComponent', () => {
     expect(logoutBtn).toBeTruthy();
     expect(logoutBtn.textContent).toContain('Logout');
   });
+
+  it('should display dashboard heading', () => {
+    const compiled = fixture.nativeElement;
+    const heading = compiled.querySelector('.welcome-section h2');
+
+    expect(heading).toBeTruthy();
+    expect(heading.textContent).toContain('Dashboard');
+  });
+
+  it('should display welcome description', () => {
+    const compiled = fixture.nativeElement;
+    const description = compiled.querySelector('.welcome-section p');
+
+    expect(description).toBeTruthy();
+    expect(description.textContent).toContain('Welcome to your task management dashboard');
+  });
 });
