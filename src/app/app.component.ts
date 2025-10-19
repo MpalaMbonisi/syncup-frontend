@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { RegisterComponent } from './features/auth/register-component/register-component';
-
+import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [RegisterComponent],
+  imports: [RouterOutlet],
 })
 export class AppComponent {
   title = 'syncup-frontend';
