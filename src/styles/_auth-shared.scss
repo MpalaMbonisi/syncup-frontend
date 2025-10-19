@@ -148,6 +148,7 @@ form {
     color: v.$primary-color;
     text-decoration: none;
     font-weight: v.$font-medium;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;
