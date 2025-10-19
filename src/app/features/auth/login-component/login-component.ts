@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FooterComponent } from '../../../shared/components/footer-component/footer-component';
 import { AuthService } from '../../../core/services/auth-service';
 import { ERROR_MESSAGES, STORAGE_KEYS, VALIDATION } from '../../../core/constants/app.constants';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login-component',
-  imports: [CommonModule, ReactiveFormsModule, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule, FooterComponent, RouterLink],
   templateUrl: './login-component.html',
   styleUrl: './login-component.scss',
 })
