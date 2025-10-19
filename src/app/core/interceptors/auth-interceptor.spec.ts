@@ -110,5 +110,25 @@ describe('authInterceptor', () => {
     expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORIZATION)).toBe(
       'Bearer my-mock-jwt-token-12345'
     );
+
+    it('should not modify original request when adding headers', () => {
+      const token = 'mock-jwt-token-12345';
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+
+      const req = new HttpRequest('GET', `${environment.apiUrl}${API_ENDPOINTS.LISTS.ALL}`);
+      const originalHeaders = req.headers;
+
+      TestBed.runInInjectionContext(() => {
+        authInterceptor(req, mockNext);
+      });
+
+      // Original request should remain unchanged
+      expect(req.headers).toBe(originalHeaders);
+      expect(req.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+
+      // Cloned request should have the header
+      const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
+      expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeTrue();
+    });
   });
 });
