@@ -51,4 +51,12 @@ describe('DashboardComponent', () => {
     expect(welcomeText).toBeTruthy();
     expect(welcomeText.textContent).toContain('Welcome, John!');
   });
+
+  it('should display logout button', () => {
+    const compiled = fixture.nativeElement;
+    const logoutBtn = compiled.querySelector('.logout-btn');
+
+    expect(logoutBtn).toBeTruthy();
+    expect(logoutBtn.textContent).toContain('Logout');
+  });
 });
