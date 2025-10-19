@@ -39,4 +39,34 @@ describe('authInterceptor', () => {
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
     expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORIZATION)).toBe(`Bearer ${token}`);
   });
+
+  it('should not add Authorisation header for login endpoint', () => {
+    const token = 'mock-jwt-token-12345';
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+
+    const req = new HttpRequest('POST', `${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`, {});
+
+    TestBed.runInInjectionContext(() => {
+      authInterceptor(req, mockNext);
+    });
+
+    expect(mockNext).toHaveBeenCalled();
+    const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+  });
+
+  it('should not add Authorisation header for register endpoint', () => {
+    const token = 'mock-jwt-token-12345';
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+
+    const req = new HttpRequest('POST', `${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`, {});
+
+    TestBed.runInInjectionContext(() => {
+      authInterceptor(req, mockNext);
+    });
+
+    expect(mockNext).toHaveBeenCalled();
+    const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+  });
 });
