@@ -37,7 +37,7 @@ describe('authInterceptor', () => {
 
     expect(mockNext).toHaveBeenCalled();
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORIZATION)).toBe(`Bearer ${token}`);
+    expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORISATION)).toBe(`Bearer ${token}`);
   });
 
   it('should not add Authorisation header for login endpoint', () => {
@@ -52,7 +52,7 @@ describe('authInterceptor', () => {
 
     expect(mockNext).toHaveBeenCalled();
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeFalse();
   });
 
   it('should not add Authorisation header for register endpoint', () => {
@@ -67,7 +67,7 @@ describe('authInterceptor', () => {
 
     expect(mockNext).toHaveBeenCalled();
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeFalse();
   });
 
   it('should not add Authorisation header when token does not exist', () => {
@@ -79,7 +79,7 @@ describe('authInterceptor', () => {
 
     expect(mockNext).toHaveBeenCalled();
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeFalse();
   });
 
   it('should handle empty token gracefully', () => {
@@ -93,7 +93,7 @@ describe('authInterceptor', () => {
 
     expect(mockNext).toHaveBeenCalled();
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeFalse();
   });
 
   it('should add Bearer prefix to token', () => {
@@ -107,7 +107,7 @@ describe('authInterceptor', () => {
     });
 
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORIZATION)).toBe(
+    expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORISATION)).toBe(
       'Bearer my-mock-jwt-token-12345'
     );
   });
@@ -125,10 +125,10 @@ describe('authInterceptor', () => {
 
     // Original request should remain unchanged
     expect(req.headers).toBe(originalHeaders);
-    expect(req.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+    expect(req.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeFalse();
 
     // Cloned request should have the header
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
-    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeTrue();
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeTrue();
   });
 });

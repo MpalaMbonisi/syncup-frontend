@@ -45,7 +45,7 @@ export const API_ENDPOINTS = {
 
 // HTTP Headers
 export const HTTP_HEADERS = {
-  AUTHORIZATION: 'Authorization',
+  AUTHORISATION: 'Authorization',
   CONTENT_TYPE: 'Content-Type',
 } as const;
 
