@@ -69,4 +69,16 @@ describe('authInterceptor', () => {
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
     expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
   });
+
+  it('should not add Authorisation header when token does not exist', () => {
+    const req = new HttpRequest('GET', `${environment.apiUrl}${API_ENDPOINTS.LISTS.ALL}`);
+
+    TestBed.runInInjectionContext(() => {
+      authInterceptor(req, mockNext);
+    });
+
+    expect(mockNext).toHaveBeenCalled();
+    const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
+    expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
+  });
 });
