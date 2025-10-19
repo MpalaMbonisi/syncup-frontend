@@ -95,4 +95,20 @@ describe('authInterceptor', () => {
     const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
     expect(interceptedRequest.headers.has(HTTP_HEADERS.AUTHORIZATION)).toBeFalse();
   });
+
+  it('should add Bearer prefix to token', () => {
+    const token = 'my-mock-jwt-token-12345';
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+
+    const req = new HttpRequest('GET', `${environment.apiUrl}${API_ENDPOINTS.LISTS.ALL}`);
+
+    TestBed.runInInjectionContext(() => {
+      authInterceptor(req, mockNext);
+    });
+
+    const interceptedRequest = (mockNext as jasmine.Spy).calls.mostRecent().args[0];
+    expect(interceptedRequest.headers.get(HTTP_HEADERS.AUTHORIZATION)).toBe(
+      'Bearer my-mock-jwt-token-12345'
+    );
+  });
 });
