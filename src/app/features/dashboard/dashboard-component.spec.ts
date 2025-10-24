@@ -142,4 +142,21 @@ describe('DashboardComponent', () => {
     expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
   });
+
+  it('should have main content section', () => {
+    const compiled = fixture.nativeElement;
+    const main = compiled.querySelector('.dashboard-main');
+
+    expect(main).toBeTruthy();
+    expect(main.querySelector('.dashboard-content')).toBeTruthy();
+  });
+
+  it('should have sticky header with proper structure', () => {
+    const compiled = fixture.nativeElement;
+    const header = compiled.querySelector('.dashboard-header');
+
+    expect(header).toBeTruthy();
+    expect(header.querySelector('.header-content')).toBeTruthy();
+    expect(header.querySelector('.header-actions')).toBeTruthy();
+  });
 });
