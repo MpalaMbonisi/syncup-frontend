@@ -75,4 +75,20 @@ describe('DashboardComponent', () => {
     expect(description).toBeTruthy();
     expect(description.textContent).toContain('Welcome to your task management dashboard');
   });
+
+  it('should display task lists section header', () => {
+    const compiled = fixture.nativeElement;
+    const sectionHeader = compiled.querySelector('.task-lists-section h3');
+
+    expect(sectionHeader).toBeTruthy();
+    expect(sectionHeader.textContent).toContain('Your Task Lists');
+  });
+
+  it('should display new list button', () => {
+    const compiled = fixture.nativeElement;
+    const newListBtn = compiled.querySelector('.btn-primary');
+
+    expect(newListBtn).toBeTruthy();
+    expect(newListBtn.textContent).toContain('+ New List');
+  });
 });
