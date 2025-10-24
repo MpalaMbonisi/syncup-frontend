@@ -159,4 +159,12 @@ describe('DashboardComponent', () => {
     expect(header.querySelector('.header-content')).toBeTruthy();
     expect(header.querySelector('.header-actions')).toBeTruthy();
   });
+
+  it('should call ngOnInit on component initialisation', () => {
+    spyOn(component, 'ngOnInit');
+
+    component.ngOnInit();
+
+    expect(component.ngOnInit).toHaveBeenCalled();
+  });
 });
