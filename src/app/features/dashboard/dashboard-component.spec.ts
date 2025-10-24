@@ -1,24 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardComponent } from './dashboard-component';
+import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
+import { provideRouter, Router } from '@angular/router';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  // let router: jasmine.SpyObj<Router>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    // const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent],
-      providers: [
-        // {provide: Router, useValue: routerSpy},
-        // providerRouter([]),
-      ],
+      providers: [{ provide: Router, useValue: routerSpy }, provideRouter([])],
     }).compileComponents();
 
-    // router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     localStorage.clear();
@@ -102,5 +101,45 @@ describe('DashboardComponent', () => {
 
   it('should initialise username', () => {
     expect(component.username).toBeDefined();
+  });
+
+  it('should call logout when logout button is clicked', () => {
+    spyOn(component, 'logout');
+
+    const compiled = fixture.nativeElement;
+    const logoutBtn = compiled.querySelector('.logout-btn');
+
+    logoutBtn.click();
+
+    expect(component.logout).toHaveBeenCalled();
+  });
+
+  it('should remove token from localStorage on logout', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-jwt-token-12345');
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, 'mock-jwt-token-12345');
+
+    component.logout();
+
+    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
+  });
+
+  it('should navigate to login page on logout', () => {
+    component.logout();
+
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+  });
+
+  it('should clear both token and user data on logout', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-jwt-token-12345');
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, '{"username": "test"}');
+
+    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeTruthy();
+    expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeTruthy();
+
+    component.logout();
+
+    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
   });
 });
