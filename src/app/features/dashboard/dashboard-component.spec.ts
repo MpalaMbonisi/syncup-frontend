@@ -91,4 +91,12 @@ describe('DashboardComponent', () => {
     expect(newListBtn).toBeTruthy();
     expect(newListBtn.textContent).toContain('+ New List');
   });
+
+  it('should display empty state message', () => {
+    const compiled = fixture.nativeElement;
+    const emptyState = compiled.querySelector('.empty-state p');
+
+    expect(emptyState).toBeTruthy();
+    expect(emptyState.textContent).toContain('No task lists yet');
+  });
 });
