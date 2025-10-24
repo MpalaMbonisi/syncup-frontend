@@ -99,4 +99,8 @@ describe('DashboardComponent', () => {
     expect(emptyState).toBeTruthy();
     expect(emptyState.textContent).toContain('No task lists yet');
   });
+
+  it('should initialise username', () => {
+    expect(component.username).toBeDefined();
+  });
 });
