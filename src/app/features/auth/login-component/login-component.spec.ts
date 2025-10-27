@@ -64,6 +64,10 @@ describe('LoginComponent', () => {
     expect(component.loginForm.get('password')?.value).toBe('');
   });
 
+  it('should initialise loading as false', () => {
+    expect(component.isLoading).toBeFalse();
+  });
+
   it('should mark form as invalid when fields are empty', () => {
     expect(component.loginForm.valid).toBeFalse();
   });
