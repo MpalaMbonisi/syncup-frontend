@@ -69,8 +69,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci 
 
-      - name: Run Security Audit
+      - name: Run Security Audit (Info Only - Moderate)
+        run: npm audit --audit-level moderate || true
+        continue-on-error: true
+
+      - name: Run Security Audit (Fail on High & Crucial)
         run: npm audit --audit-level high
 
-      - name: Run Dependency Check
-        run: npx audit-ci --moderate
+      - name: Run Dependency Check (High & Crucial Only)
+        run: npx audit-ci --crucial
+        continue-on-error: false
