@@ -37,7 +37,9 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="loginForm.invalid">Log In</button>
+    <button type="submit" [disabled]="loginForm.invalid || isLoading">
+      {{ isLoading ? 'Logging in...' : 'Log In'}}
+    </button>
   </form>
 
   <div class="register-prompt">Don't have an account? <a routerLink="/register">Register here</a></div>

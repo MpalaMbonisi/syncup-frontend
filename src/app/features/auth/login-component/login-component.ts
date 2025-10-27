@@ -3,8 +3,13 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FooterComponent } from '../../../shared/components/footer-component/footer-component';
 import { AuthService } from '../../../core/services/auth-service';
-import { ERROR_MESSAGES, STORAGE_KEYS, VALIDATION } from '../../../core/constants/app.constants';
-import { RouterLink } from '@angular/router';
+import {
+  ERROR_MESSAGES,
+  ROUTES,
+  STORAGE_KEYS,
+  VALIDATION,
+} from '../../../core/constants/app.constants';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login-component',
@@ -15,11 +20,12 @@ import { RouterLink } from '@angular/router';
 export class LoginComponent {
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
-  // private router = inject(Router);
+  private router = inject(Router);
 
   loginForm: FormGroup;
   errorMessage: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false;
 
   constructor() {
     this.loginForm = this.formBuilder.group({
@@ -35,13 +41,15 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       this.errorMessage = '';
+      this.isLoading = true;
 
       this.authService.login(this.loginForm.value).subscribe({
         next: response => {
           // store token in localStorage
           localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
-          // navigate to home
-          // this.router.nagivate([ROUTES.DASHBOARD]);
+
+          // navigate to dashboard
+          this.router.navigate([ROUTES.DASHBOARD]);
         },
         error: error => {
           if (error.error && error.error.message) {
