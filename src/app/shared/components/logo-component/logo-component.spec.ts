@@ -71,4 +71,52 @@ describe('LogoComponent', () => {
       });
     });
   });
+
+  describe('Size Classes', () => {
+    it('should not have size class when medium (default)', () => {
+      const logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('small')).toBeFalse();
+      expect(logoContainer?.classList.contains('large')).toBeFalse();
+    });
+
+    it('should add small class when size is small', () => {
+      component.size = 'small';
+      fixture.detectChanges();
+
+      const logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('small')).toBeTrue();
+    });
+
+    it('should add large class when size is large', () => {
+      component.size = 'large';
+      fixture.detectChanges();
+
+      const logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('large')).toBeTrue();
+    });
+
+    it('should remove small class when size changes from small to medium', () => {
+      component.size = 'small';
+      fixture.detectChanges();
+      let logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('small')).toBeTrue();
+
+      component.size = 'medium';
+      fixture.detectChanges();
+      logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('small')).toBeFalse();
+    });
+
+    it('should remove large class when size changes from large to medium', () => {
+      component.size = 'large';
+      fixture.detectChanges();
+      let logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('large')).toBeTrue();
+
+      component.size = 'medium';
+      fixture.detectChanges();
+      logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('large')).toBeFalse();
+    });
+  });
 });
