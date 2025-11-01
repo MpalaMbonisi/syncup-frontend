@@ -44,4 +44,31 @@ describe('LogoComponent', () => {
       expect(svg?.getAttribute('viewBox')).toBe('0 0 100 100');
     });
   });
+
+  describe('SVG Elements', () => {
+    it('should render circular background', () => {
+      const circle = compiled.querySelector('circle');
+      expect(circle).toBeTruthy();
+      expect(circle?.getAttribute('cx')).toBe('50');
+      expect(circle?.getAttribute('cy')).toBe('50');
+      expect(circle?.getAttribute('r')).toBe('48');
+    });
+
+    it('should render sync arrows', () => {
+      const paths = compiled.querySelectorAll('path');
+      expect(paths.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('should have correct circle fill color', () => {
+      const circle = compiled.querySelector('circle');
+      expect(circle?.getAttribute('fill')).toBe('#4f46e5');
+    });
+
+    it('should have white stroke colour for arrows', () => {
+      const paths = compiled.querySelectorAll('path');
+      paths.forEach(path => {
+        expect(path.getAttribute('stroke')).toBe('white');
+      });
+    });
+  });
 });
