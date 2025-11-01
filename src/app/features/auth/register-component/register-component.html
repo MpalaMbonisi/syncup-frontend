@@ -1,3 +1,5 @@
+<app-logo-component></app-logo-component>
+
 <div class="register-container">
   <h2>Create Account</h2>
 
@@ -110,7 +112,9 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+    <button type="submit" [disabled]="registerForm.invalid || isLoading">
+      {{ isLoading ? 'Registering...' : 'Register'}}
+    </button>
   </form>
 
   <div class="login-prompt">Already have an account? <a routerLink="/login">Log in here</a></div>

@@ -9,10 +9,11 @@ import {
   SUCCESS_MESSAGES,
   VALIDATION,
 } from '../../../core/constants/app.constants';
+import { LogoComponent } from '../../../shared/components/logo-component/logo-component';
 
 @Component({
   selector: 'app-register-component',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent, LogoComponent],
   templateUrl: './register-component.html',
   styleUrl: './register-component.scss',
 })
@@ -25,6 +26,7 @@ export class RegisterComponent {
   errorMessage: string = '';
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  isLoading: boolean = false;
 
   constructor() {
     this.registerForm = this.formBuilder.group(
@@ -63,12 +65,14 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.successMessage = '';
       this.errorMessage = '';
+      this.isLoading = true;
 
       const userData = { ...this.registerForm.value };
       delete userData.confirmPassword;
 
       this.authService.register(userData).subscribe({
         next: () => {
+          this.isLoading = false;
           this.successMessage = SUCCESS_MESSAGES.REGISTRATION_SUCCESS;
           this.registerForm.reset();
         },
