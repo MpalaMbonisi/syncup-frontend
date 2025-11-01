@@ -297,4 +297,31 @@ describe('RegisterComponent', () => {
     expect(footerElement).not.toBeNull();
     expect(footerElement).toBeTruthy();
   });
+
+  describe('Logo Component Integration', () => {
+    it('should display the logo component', () => {
+      const logoElement = fixture.debugElement.query(By.css('app-logo-component'));
+      expect(logoElement).toBeTruthy();
+    });
+
+    it('should render logo with medium size by default', () => {
+      const logoElement = fixture.debugElement.query(By.css('app-logo-component'));
+      const logoComponent = logoElement.componentInstance;
+      expect(logoComponent.size).toBe('medium');
+    });
+
+    it('should display logo above the form title', () => {
+      const compiled = fixture.nativeElement;
+      const logo = compiled.querySelector('app-logo-component');
+      const heading = compiled.querySelector('h2');
+
+      expect(logo).toBeTruthy();
+      expect(heading).toBeTruthy();
+
+      // Logo should appear before heading in DOM
+      const logoIndex = Array.from(compiled.querySelectorAll('*')).indexOf(logo);
+      const headingIndex = Array.from(compiled.querySelectorAll('*')).indexOf(heading);
+      expect(logoIndex).toBeLessThan(headingIndex);
+    });
+  });
 });

@@ -314,7 +314,6 @@ describe('LoginComponent', () => {
 
     expect(authService.login).not.toHaveBeenCalled();
   });
-  // Add this test to your existing login-component.spec.ts file
 
   describe('Logo Component Integration', () => {
     it('should display the logo component', () => {
