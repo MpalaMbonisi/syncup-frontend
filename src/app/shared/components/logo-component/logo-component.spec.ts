@@ -119,4 +119,24 @@ describe('LogoComponent', () => {
       expect(logoContainer?.classList.contains('large')).toBeFalse();
     });
   });
+
+  describe('Styling', () => {
+    it('should have flex display for logo container', () => {
+      const logoContainer = compiled.querySelector('.logo-container') as HTMLElement;
+      const styles = window.getComputedStyle(logoContainer);
+      expect(styles.display).toBe('flex');
+    });
+
+    it('should center align items in logo container', () => {
+      const logoContainer = compiled.querySelector('.logo-container') as HTMLElement;
+      const styles = window.getComputedStyle(logoContainer);
+      expect(styles.alignItems).toBe('center');
+    });
+
+    it('should have column flex direction for logo container', () => {
+      const logoContainer = compiled.querySelector('.logo-container') as HTMLElement;
+      const styles = window.getComputedStyle(logoContainer);
+      expect(styles.flexDirection).toBe('column');
+    });
+  });
 });
