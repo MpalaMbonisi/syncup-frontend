@@ -139,4 +139,29 @@ describe('LogoComponent', () => {
       expect(styles.flexDirection).toBe('column');
     });
   });
+
+  describe('Visual Regression Guards', () => {
+    it('should maintain logo container structure', () => {
+      const logoContainer = compiled.querySelector('.logo-container');
+      const logo = logoContainer?.querySelector('.logo');
+      const logoText = logoContainer?.querySelector('.logo-text');
+
+      expect(logo).toBeTruthy();
+      expect(logoText).toBeTruthy();
+    });
+
+    it('should maintain SVG structure', () => {
+      const svg = compiled.querySelector('svg');
+      const circle = svg?.querySelector('circle');
+      const paths = svg?.querySelectorAll('path');
+
+      expect(circle).toBeTruthy();
+      expect(paths?.length).toBeGreaterThan(0);
+    });
+
+    it('should have correct logo text content', () => {
+      const logoText = compiled.querySelector('.logo-text');
+      expect(logoText?.textContent?.trim()).toBe('SyncUp');
+    });
+  });
 });
