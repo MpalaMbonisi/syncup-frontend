@@ -164,4 +164,30 @@ describe('LogoComponent', () => {
       expect(logoText?.textContent?.trim()).toBe('SyncUp');
     });
   });
+
+  describe('Edge Cases', () => {
+    it('should handle rapid size changes', () => {
+      component.size = 'small';
+      fixture.detectChanges();
+      component.size = 'large';
+      fixture.detectChanges();
+      component.size = 'medium';
+      fixture.detectChanges();
+
+      const logoContainer = compiled.querySelector('.logo-container');
+      expect(logoContainer?.classList.contains('small')).toBeFalse();
+      expect(logoContainer?.classList.contains('large')).toBeFalse();
+    });
+
+    it('should render correctly with default values', () => {
+      const newFixture = TestBed.createComponent(LogoComponent);
+      newFixture.detectChanges();
+
+      const logoContainer = newFixture.nativeElement.querySelector('.logo-container');
+      const logoText = newFixture.nativeElement.querySelector('.logo-text');
+
+      expect(logoContainer).toBeTruthy();
+      expect(logoText?.textContent).toBe('SyncUp');
+    });
+  });
 });
