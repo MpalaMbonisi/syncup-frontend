@@ -8,9 +8,6 @@ describe('JwtDecoderService', () => {
   const validToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTczNTMyNDgwMCwiZXhwIjo5OTk5OTk5OTk5fQ.t8qY7X4aKZ2z5qB0mNlC6wVfJ9xH3eR4sT1pQ8uG7vI';
 
-  // const expiredToken =
-  //  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTczNTMyNDgwMCwiZXhwIjoxNzM1MzI4NDAwfQ.9L5fZ7K2xW1qR4tY8vN3mP6jS0cH9gU2bA7dE5iO3fT';
-
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(JwtDecoderService);
@@ -62,6 +59,18 @@ describe('JwtDecoderService', () => {
       const username = service.getUsername('');
 
       expect(username).toBeNull();
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle token with special characters in username', () => {
+      // Token with username "test@user.com"
+      const specialToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QHVzZXIuY29tIiwiaWF0IjoxNzM1MzI0ODAwLCJleHAiOjk5OTk5OTk5OTl9.xN8vK4pQ2sL1mW9tY6jH5oR3cZ7fA0bE9gU1dP4iV8r';
+
+      const username = service.getUsername(specialToken);
+
+      expect(username).toBe('test@user.com');
     });
   });
 });
