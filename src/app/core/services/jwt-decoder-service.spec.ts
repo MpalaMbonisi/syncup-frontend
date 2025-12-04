@@ -44,4 +44,24 @@ describe('JwtDecoderService', () => {
       expect(payload).toBeNull();
     });
   });
+
+  describe('getUserFromToken', () => {
+    it('should extract user information from valid token', () => {
+      const username = service.getUsername(validToken);
+
+      expect(username).toBe('testuser');
+    });
+
+    it('should return null for invalid token', () => {
+      const username = service.getUsername('invalid.jwt.token');
+
+      expect(username).toBeNull();
+    });
+
+    it('should return null for empty token', () => {
+      const username = service.getUsername('');
+
+      expect(username).toBeNull();
+    });
+  });
 });
