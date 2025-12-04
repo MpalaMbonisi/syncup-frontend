@@ -6,7 +6,7 @@ export interface JwtPayload {
   exp: number;
 }
 
-export interface DecodeUser {
+export interface DecodedUser {
   username: string;
   issuedAt: Date;
   expiresAt: Date;
@@ -41,6 +41,61 @@ export class JwtDecoderService {
       console.error('Error decoding JWT token:', error);
       return null;
     }
+  }
+
+  /**
+   * Extracts user information from JWT token
+   * @param token - JWT token string
+   * @returns User information or null if invalid
+   */
+  getUserFromToken(token: string): DecodedUser | null {
+    const payload = this.decodeToken(token);
+
+    if (!payload) {
+      return null;
+    }
+
+    return {
+      username: payload.sub,
+      issuedAt: new Date(payload.iat * 1000),
+      expiresAt: new Date(payload.exp * 1000),
+      isExpired: this.isTokenExpired(payload.exp),
+    };
+  }
+
+  /**
+   * Checks if a token is expired
+   * @param token - JWT token string
+   * @returns true if expired, false otherwise
+   */
+  isTokenExpired(expOrToken: number | string): boolean {
+    try {
+      let exp: number;
+
+      if (typeof expOrToken === 'string') {
+        const payload = this.decodeToken(expOrToken);
+        if (!payload) return true;
+        exp = payload.exp;
+      } else {
+        exp = expOrToken;
+      }
+
+      const now = Math.floor(Date.now() / 1000); // Current time in seconds
+      return exp < now;
+    } catch (error) {
+      console.error('Error checking token expiration: ', error);
+      return true; // Treat errors as expired
+    }
+  }
+
+  /**
+   * Get the username from a token
+   * @param token - JWT token string
+   * @returns Username or nul if invalid
+   */
+  getUsername(token: string): string | null {
+    const user = this.getUserFromToken(token);
+    return user ? user.username : null;
   }
 
   /**
