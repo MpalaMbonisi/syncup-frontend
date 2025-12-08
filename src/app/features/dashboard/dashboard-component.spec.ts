@@ -321,4 +321,49 @@ describe('DashboardComponent', () => {
       expect(completedCount).toBe(0);
     });
   });
+
+  describe('Ownership Check', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token-12345');
+      jwtDecoder.getUserFromToken.and.returnValue(mockValidUser);
+      taskListService.getAllLists.and.returnValue(of(mockTaskLists));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should return true when user is the owner', () => {
+      const list = mockTaskLists[0]; // owner: 'johndoe'
+      const isOwner = component.isOwner(list);
+
+      expect(isOwner).toBeTrue();
+    });
+
+    it('should return false when user is not the owner', () => {
+      const collaboratorList: TaskListResponseDTO = {
+        id: 3,
+        title: 'Team List',
+        owner: 'janedoe',
+        collaborators: ['johndoe'],
+        tasks: [],
+      };
+
+      const isOwner = component.isOwner(collaboratorList);
+      expect(isOwner).toBeFalse();
+    });
+
+    it('should handle case-insensitive username comparison', () => {
+      const list: TaskListResponseDTO = {
+        id: 3,
+        title: 'Test List',
+        owner: 'JOHNDOE',
+        collaborators: [],
+        tasks: [],
+      };
+
+      const isOwner = component.isOwner(list);
+      expect(isOwner).toBeTrue();
+    });
+  });
 });
