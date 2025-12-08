@@ -97,6 +97,20 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
+   * Get the count of incomplete tasks for a list
+   */
+  getIncompleteTaskCount(list: TaskListResponseDTO): number {
+    return list.tasks.filter(task => !task.completed).length;
+  }
+
+  /**
+   * Get the count of completed tasks for a list
+   */
+  getCompletedTaskCount(list: TaskListResponseDTO): number {
+    return list.tasks.filter(task => task.completed).length;
+  }
+
+  /**
    * Capitalize first letter of username for display
    */
   private capitalizeFirstLetter(text: string): string {
