@@ -221,4 +221,76 @@ describe('TaskListService', () => {
       req.flush(mockError, { status: 403, statusText: 'Forbidden' });
     });
   });
+
+  describe('createList', () => {
+    it('should create a new task list successfully', () => {
+      const newList = { title: 'New Shopping List' };
+      const mockResponse = {
+        id: 1,
+        title: 'New Shopping List',
+        owner: 'mbonisimpala',
+        collaborators: [],
+        tasks: [],
+      };
+
+      service.createList(newList).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.title).toBe(newList.title);
+        expect(response.id).toBe(1);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/create`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(newList);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 409 conflict error when duplicate title exists', () => {
+      const newList = { title: 'Shopping List' };
+      const mockError = { message: 'You already have a list with this title!' };
+
+      service.createList(newList).subscribe({
+        next: () => fail('should have failed with 409 error'),
+        error: error => {
+          expect(error.status).toBe(409);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/create`);
+      req.flush(mockError, { status: 409, statusText: 'Conflict' });
+    });
+
+    it('should handle 400 bad request when title is empty', () => {
+      const newList = { title: '' };
+      const mockError = { message: ['Title cannot be empty.'] };
+
+      service.createList(newList).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/create`);
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('should handle 400 bad request when title is blank', () => {
+      const newList = { title: '     ' };
+      const mockError = { message: ['Title cannot be blank.'] };
+
+      service.createList(newList).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/create`);
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+  });
 });
