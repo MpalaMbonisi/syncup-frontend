@@ -73,7 +73,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Load all task lists for the current user
    */
-  private loadTaskLists(): void {
+  public loadTaskLists(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
