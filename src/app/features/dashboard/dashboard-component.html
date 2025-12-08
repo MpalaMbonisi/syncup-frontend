@@ -13,7 +13,7 @@
     <div class="dashboard-content">
       <div class="welcome-section">
         <h2>Dashboard</h2>
-        <p>Welcome to your task management dashboard. Your task lists will appear here.</p>
+        <p>Manage your task lists and collaborate with your team.</p>
       </div>
 
       <div class="task-lists-section">
@@ -21,10 +21,112 @@
           <h3>Your Task Lists</h3>
           <button class="btn-primary">+ New List</button>
         </div>
-      </div>
 
-      <div class="empty-state">
-        <p>No task lists yet. Create your first list to get started!</p>
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading your task lists...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="errorMessage && !isLoading" class="error-state">
+          <p>{{ errorMessage }}</p>
+          <button class="btn-secondary" (click)="loadTaskLists()">Try Again</button>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && !errorMessage && taskLists.length === 0" class="empty-state">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 3v18h18" />
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+          </svg>
+          <h4>No task lists yet</h4>
+          <p>Create your first list to get started organizing your tasks!</p>
+          <button class="btn-primary">+ Create Your First List</button>
+        </div>
+
+        <!-- Task Lists Grid -->
+        <div *ngIf="!isLoading && !errorMessage && taskLists.length > 0" class="task-lists-grid">
+          <div *ngFor="let list of taskLists" class="task-list-card">
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="card-title-section">
+                <h4 class="card-title">{{ list.title }}</h4>
+                <span *ngIf="isOwner(list)" class="owner-badge">Owner</span>
+                <span *ngIf="!isOwner(list)" class="collaborator-badge">Collaborator</span>
+              </div>
+              <button class="card-menu-btn" title="More options">⋮</button>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+              <!-- Task Stats -->
+              <div class="task-stats">
+                <div class="stat">
+                  <span class="stat-label">Total Tasks</span>
+                  <span class="stat-value">{{ list.tasks.length }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Completed</span>
+                  <span class="stat-value completed">{{ getCompletedTaskCount(list) }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Pending</span>
+                  <span class="stat-value pending">{{ getIncompleteTaskCount(list) }}</span>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress-container" *ngIf="list.tasks.length > 0">
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="(getCompletedTaskCount(list) / list.tasks.length) * 100"
+                  ></div>
+                </div>
+                <span class="progress-text">
+                  {{ ((getCompletedTaskCount(list) / list.tasks.length) * 100).toFixed(0) }}% Complete
+                </span>
+              </div>
+
+              <!-- Collaborators Info -->
+              <div class="collaborators-info" *ngIf="list.collaborators.length > 0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>{{ list.collaborators.length }} collaborator<span *ngIf="list.collaborators.length > 1">s</span></span>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <button class="btn-view">View Details</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
