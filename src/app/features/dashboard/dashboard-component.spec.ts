@@ -247,4 +247,78 @@ describe('DashboardComponent', () => {
       expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
   });
+
+  describe('Task Statistics', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token-12345');
+      jwtDecoder.getUserFromToken.and.returnValue(mockValidUser);
+      taskListService.getAllLists.and.returnValue(of(mockTaskLists));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should calculate incomplete task count correctly', () => {
+      const list = mockTaskLists[0]; // Shopping List: 1 incomplete, 1 complete
+      const incompleteCount = component.getIncompleteTaskCount(list);
+
+      expect(incompleteCount).toBe(1);
+    });
+
+    it('should calculate completed task count correctly', () => {
+      const list = mockTaskLists[0]; // Shopping List: 1 incomplete, 1 complete
+      const completedCount = component.getCompletedTaskCount(list);
+
+      expect(completedCount).toBe(1);
+    });
+
+    it('should return 0 for incomplete tasks when all tasks are completed', () => {
+      const allCompletedList: TaskListResponseDTO = {
+        id: 3,
+        title: 'Completed List',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [
+          { id: 4, description: 'Task 1', completed: true, taskListTitle: 'Completed List' },
+          { id: 5, description: 'Task 2', completed: true, taskListTitle: 'Completed List' },
+        ],
+      };
+
+      const incompleteCount = component.getIncompleteTaskCount(allCompletedList);
+      expect(incompleteCount).toBe(0);
+    });
+
+    it('should return 0 for completed tasks when all tasks are incomplete', () => {
+      const allIncompleteList: TaskListResponseDTO = {
+        id: 3,
+        title: 'Incomplete List',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [
+          { id: 4, description: 'Task 1', completed: false, taskListTitle: 'Incomplete List' },
+          { id: 5, description: 'Task 2', completed: false, taskListTitle: 'Incomplete List' },
+        ],
+      };
+
+      const completedCount = component.getCompletedTaskCount(allIncompleteList);
+      expect(completedCount).toBe(0);
+    });
+
+    it('should handle lists with no tasks', () => {
+      const emptyList: TaskListResponseDTO = {
+        id: 3,
+        title: 'Empty List',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      const incompleteCount = component.getIncompleteTaskCount(emptyList);
+      const completedCount = component.getCompletedTaskCount(emptyList);
+
+      expect(incompleteCount).toBe(0);
+      expect(completedCount).toBe(0);
+    });
+  });
 });
