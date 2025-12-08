@@ -4,6 +4,7 @@ import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { Router } from '@angular/router';
 import { FooterComponent } from '../../shared/components/footer-component/footer-component';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
+import { TaskListResponseDTO, TaskListService } from '../../core/services/task-list-service';
 
 @Component({
   selector: 'app-dashboard-component',
@@ -14,12 +15,17 @@ import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private jwtDecoder = inject(JwtDecoderService);
+  private taskListService = inject(TaskListService);
 
   username: string = '';
   isTokenExpired: boolean = false;
+  taskLists: TaskListResponseDTO[] = [];
+  isLoading: boolean = false;
+  errorMessage: string = '';
 
   ngOnInit(): void {
     this.loadUserInfo();
+    this.loadTaskLists();
   }
 
   /**
@@ -62,6 +68,32 @@ export class DashboardComponent implements OnInit {
 
     console.log('User loaded:', this.username);
     console.log('Token expires at:', user.expiresAt);
+  }
+
+  /**
+   * Load all task lists for the current user
+   */
+  private loadTaskLists(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.taskListService.getAllLists().subscribe({
+      next: lists => {
+        this.taskLists = lists;
+        this.isLoading = false;
+        console.log('Task lists loaded:', lists.length);
+      },
+      error: error => {
+        console.error('Error loading task lists:', error);
+        this.errorMessage = 'Failed to load task lists. Please try again.';
+        this.isLoading = false;
+
+        // If unauthorized, redirect to login
+        if (error.status === 401) {
+          this.logout();
+        }
+      },
+    });
   }
 
   /**
