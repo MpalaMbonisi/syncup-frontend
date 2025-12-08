@@ -111,6 +111,13 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
+   * Check if the current user is the owner of a list
+   */
+  isOwner(list: TaskListResponseDTO): boolean {
+    return list.owner.toLowerCase() === this.username.toLowerCase();
+  }
+
+  /**
    * Capitalize first letter of username for display
    */
   private capitalizeFirstLetter(text: string): string {
