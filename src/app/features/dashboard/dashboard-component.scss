@@ -1,6 +1,6 @@
 @use "../../../styles/variables" as v;
 
 // Import the modular partials to structure the large file
-@use './_dashboard-layout.scss';
-@use './_states.scss';
-@use './_task-list-card.scss';
+@use "./_dashboard-layout.scss";
+@use "./_states.scss";
+@use "./_task-list-card.scss";
