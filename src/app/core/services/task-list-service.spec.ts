@@ -159,4 +159,66 @@ describe('TaskListService', () => {
       req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
     });
   });
+
+  describe('getListById', () => {
+    it('should return a specific task list by ID', () => {
+      const listId = 1;
+      const mockResponse = {
+        id: listId,
+        title: 'Shopping List',
+        owner: 'mbonisimpala',
+        collaborators: [],
+        tasks: [
+          {
+            id: 1,
+            description: 'Buy milk',
+            completed: false,
+            taskListTitle: 'Shopping List',
+          },
+        ],
+      };
+
+      service.getListById(listId).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.id).toBe(listId);
+        expect(response.title).toBe('Shopping List');
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should handle 404 error when list does not exist', () => {
+      const listId = 999;
+      const mockError = { message: "List not found or you don't have access to it!" };
+
+      service.getListById(listId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle 403 error when user does not have access', () => {
+      const listId = 1;
+      const mockError = { message: "List not found or you don't have access to it!" };
+
+      service.getListById(listId).subscribe({
+        next: () => fail('should have failed with 403 error'),
+        error: error => {
+          expect(error.status).toEqual(403);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      req.flush(mockError, { status: 403, statusText: 'Forbidden' });
+    });
+  });
 });
