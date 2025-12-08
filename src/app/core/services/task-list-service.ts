@@ -35,4 +35,11 @@ export class TaskListService {
   getAllLists(): Observable<TaskListResponseDTO[]> {
     return this.http.get<TaskListResponseDTO[]>(`${this.apiUrl}/all`);
   }
+
+  /**
+   * Get a specific task list by ID
+   */
+  getListById(id: number): Observable<TaskListResponseDTO> {
+    return this.http.get<TaskListResponseDTO>(`${this.apiUrl}/${id}`);
+  }
 }
