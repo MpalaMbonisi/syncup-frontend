@@ -5,7 +5,7 @@ import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { provideRouter, Router } from '@angular/router';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
 import { TaskListResponseDTO, TaskListService } from '../../core/services/task-list-service';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -392,6 +392,129 @@ describe('DashboardComponent', () => {
       component.logout();
 
       expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+  });
+  describe('Task Lists Loading & UI Display', () => {
+    let taskListSubject: Subject<TaskListResponseDTO[]>;
+
+    beforeEach(async () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token-12345');
+      jwtDecoder.getUserFromToken.and.returnValue(mockValidUser);
+
+      taskListSubject = new Subject<TaskListResponseDTO[]>();
+      taskListService.getAllLists.and.returnValue(taskListSubject.asObservable());
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should display welcome message with username', () => {
+      taskListService.getAllLists.and.returnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      const welcomeText = compiled.querySelector('.welcome-text');
+
+      expect(welcomeText).toBeTruthy();
+      expect(welcomeText.textContent).toContain('Welcome, Johndoe!');
+    });
+
+    it('should display empty state when no task lists exist', () => {
+      taskListService.getAllLists.and.returnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      const emptyState = compiled.querySelector('.empty-state');
+
+      expect(emptyState).toBeTruthy();
+      expect(emptyState.textContent).toContain('No task lists yet');
+    });
+
+    it('should display task lists when they exist', () => {
+      taskListService.getAllLists.and.returnValue(of(mockTaskLists));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      const taskListCards = compiled.querySelectorAll('.task-list-card');
+
+      expect(taskListCards.length).toBe(2);
+    });
+
+    it('should display loading state while fetching lists', async () => {
+      // 1. Wait for any microtasks related to the initial setup to complete.
+      await fixture.whenStable();
+
+      // 2. Ensure Angular updates the template one last time before querying the DOM.
+      fixture.detectChanges();
+
+      // ASSERTION: The loading element must be present in the DOM now.
+      const compiled = fixture.nativeElement;
+      const loadingState = compiled.querySelector('.loading-state');
+
+      // We assert that the element exists.
+      expect(loadingState).toBeTruthy();
+
+      // Optional: Assert the component property is also true
+      expect(component.isLoading).toBeTrue();
+
+      // Cleanup: Complete the subscription so the next test starts clean
+      taskListSubject.next([]);
+      taskListSubject.complete();
+    });
+
+    it('should display error state when loading fails', () => {
+      const mockError = { status: 500, message: 'Server error' };
+      taskListService.getAllLists.and.returnValue(throwError(() => mockError));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      const errorState = compiled.querySelector('.error-state');
+
+      expect(errorState).toBeTruthy();
+      expect(errorState.textContent).toContain('Failed to load task lists');
+    });
+
+    it('should display logout button', () => {
+      taskListService.getAllLists.and.returnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      const logoutBtn = compiled.querySelector('.logout-btn');
+
+      expect(logoutBtn).toBeTruthy();
+      expect(logoutBtn.textContent).toContain('Logout');
+    });
+
+    it('should call logout when logout button is clicked', () => {
+      taskListService.getAllLists.and.returnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      spyOn(component, 'logout');
+
+      const compiled = fixture.nativeElement;
+      const logoutBtn = compiled.querySelector('.logout-btn');
+      logoutBtn.click();
+
+      expect(component.logout).toHaveBeenCalled();
     });
   });
 });
