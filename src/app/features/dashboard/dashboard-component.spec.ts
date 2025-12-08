@@ -366,4 +366,32 @@ describe('DashboardComponent', () => {
       expect(isOwner).toBeTrue();
     });
   });
+
+  describe('Logout', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token-12345');
+      jwtDecoder.getUserFromToken.and.returnValue(mockValidUser);
+      taskListService.getAllLists.and.returnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should remove token from localStorage on logout', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token-12345');
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, '{"username":"test"}');
+
+      component.logout();
+
+      expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
+    });
+
+    it('should navigate to login page on logout', () => {
+      component.logout();
+
+      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+  });
 });
