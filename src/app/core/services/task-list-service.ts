@@ -42,4 +42,11 @@ export class TaskListService {
   getListById(id: number): Observable<TaskListResponseDTO> {
     return this.http.get<TaskListResponseDTO>(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Create a new task list
+   */
+  createList(dto: TaskListCreateDTO): Observable<TaskListResponseDTO> {
+    return this.http.post<TaskListResponseDTO>(`${this.apiUrl}/create`, dto);
+  }
 }
