@@ -1,10 +1,9 @@
-<app-logo-component></app-logo-component>
+<div class="logo-container">
+  <h1 class="logo-text">SyncUp</h1>
+</div>
 
 <div class="register-container">
   <h2>Create Account</h2>
-
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
 
   <!-- Error Message -->
   <div *ngIf="errorMessage" class="error-message-box">{{ errorMessage }}</div>
@@ -116,6 +115,9 @@
       {{ isLoading ? 'Registering...' : 'Register'}}
     </button>
   </form>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
 
   <div class="login-prompt">Already have an account? <a routerLink="/login">Log in here</a></div>
 </div>
