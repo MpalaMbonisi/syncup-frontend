@@ -116,4 +116,75 @@ describe('AccountService', () => {
       req.flush(mockError, { status: 500, statusText: 'Internal Server Error' });
     });
   });
+
+  describe('deleteAccount', () => {
+    it('should delete account successfully', () => {
+      service.deleteAccount().subscribe(response => {
+        expect(response).toBeNull();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+
+    it('should include authorization header', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'test-token');
+
+      service.deleteAccount().subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
+
+      expect(req.request.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeTrue();
+      expect(req.request.headers.get(HTTP_HEADERS.AUTHORISATION)).toBe('Bearer test-token');
+
+      req.flush(null, { status: 204, statusText: 'No Content' });
+      localStorage.clear(); // Cleanup
+    });
+
+    it('should handle 401 unauthorized error', () => {
+      const mockError = { message: 'Unauthorized' };
+
+      service.deleteAccount().subscribe({
+        next: () => fail('should have failed with 401 error'),
+        error: error => {
+          expect(error.status).toBe(401);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
+      req.flush(mockError, { status: 401, statusText: 'Unauthorized' });
+    });
+
+    it('should handle 403 forbidden error', () => {
+      const mockError = { message: 'Access denied' };
+
+      service.deleteAccount().subscribe({
+        next: () => fail('should have failed with 403 error'),
+        error: error => {
+          expect(error.status).toBe(403);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
+      req.flush(mockError, { status: 403, statusText: 'Forbidden' });
+    });
+
+    it('should handle 500 server error', () => {
+      const mockError = { message: 'Failed to delete account' };
+
+      service.deleteAccount().subscribe({
+        next: () => fail('should have failed with 500 error'),
+        error: error => {
+          expect(error.status).toBe(500);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
+      req.flush(mockError, { status: 500, statusText: 'Internal Server Error' });
+    });
+  });
 });
