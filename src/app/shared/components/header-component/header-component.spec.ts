@@ -34,19 +34,24 @@ describe('HeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Logo Component Integration', () => {
-    it('should display the logo component', () => {
-      const logoElement = fixture.debugElement.query(By.css('app-logo-component'));
-      expect(logoElement).toBeTruthy();
+  describe('Text Logo Section', () => {
+    it('should render the "SyncUp" text logo', () => {
+      const logoTextElement = fixture.debugElement.query(By.css('.logo-link h2'));
+
+      expect(logoTextElement).toBeTruthy();
+      expect(logoTextElement.nativeElement.textContent.trim()).toBe('SyncUp');
     });
 
-    it('should render logo with small size', () => {
-      const logoElement = fixture.debugElement.query(By.css('app-logo-component'));
-      const logoComponent = logoElement.componentInstance;
-      expect(logoComponent.size).toBe('small');
+    it('should call navigateToDashboard when the logo container is clicked', () => {
+      spyOn(component, 'navigateToDashboard');
+
+      const logoContainer = fixture.debugElement.query(By.css('.logo-link'));
+      logoContainer.nativeElement.click();
+
+      expect(component.navigateToDashboard).toHaveBeenCalled();
     });
 
-    it('should navigate to dashboard when logo is clicked', () => {
+    it('should eventually trigger router navigation via the component method', () => {
       const logoContainer = fixture.debugElement.query(By.css('.logo-link'));
       logoContainer.nativeElement.click();
 
