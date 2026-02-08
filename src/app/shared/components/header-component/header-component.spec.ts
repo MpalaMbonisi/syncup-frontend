@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderComponent } from './header-component';
 import { provideRouter, Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { ROUTES } from '../../../core/constants/app.constants';
+import { ROUTES, STORAGE_KEYS } from '../../../core/constants/app.constants';
 import { AuthService } from '../../../core/services/auth-service';
 
 describe('HeaderComponent', () => {
@@ -156,6 +156,37 @@ describe('HeaderComponent', () => {
       modalContent.nativeElement.click();
 
       expect(component.isSettingsModalOpen).toBeTrue();
+    });
+  });
+
+  describe('Logout Functionality', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token');
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, '{"username":"test"}');
+    });
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('should clear localStorage on logout', () => {
+      component.logout();
+
+      expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
+    });
+
+    it('should navigate to login page on logout', () => {
+      component.logout();
+
+      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should close modal on logout', () => {
+      component.isSettingsModalOpen = true;
+      component.logout();
+
+      expect(component.isSettingsModalOpen).toBeFalse();
     });
   });
 });
