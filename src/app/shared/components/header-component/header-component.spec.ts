@@ -3,11 +3,13 @@ import { HeaderComponent } from './header-component';
 import { provideRouter, Router } from '@angular/router';
 import { AccountService, UserResponseDTO } from '../../../core/services/account-service';
 import { of } from 'rxjs';
+import { By } from '@angular/platform-browser';
+import { ROUTES } from '../../../core/constants/app.constants';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  // let router: jasmine.SpyObj<Router>;
+  let router: jasmine.SpyObj<Router>;
   let accountService: jasmine.SpyObj<AccountService>;
   // let compiled: HTMLElement;
 
@@ -35,7 +37,7 @@ describe('HeaderComponent', () => {
       ],
     }).compileComponents();
 
-    // router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     accountService = TestBed.inject(AccountService) as jasmine.SpyObj<AccountService>;
 
     // Default successful response for account details
@@ -70,6 +72,33 @@ describe('HeaderComponent', () => {
 
     it('should initialize with no error message', () => {
       expect(component.accountDetailsError).toBe('');
+    });
+  });
+
+  describe('Text Logo', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should display the SyncUp text logo', () => {
+      const logoText = fixture.debugElement.query(By.css('.logo-text'));
+
+      expect(logoText).toBeTruthy();
+      expect(logoText.nativeElement.textContent.trim()).toBe('SyncUp');
+    });
+
+    it('should use Miltonian Tattoo font family', () => {
+      const logoText = fixture.debugElement.query(By.css('.logo-text'));
+      const styles = window.getComputedStyle(logoText.nativeElement);
+
+      expect(styles.fontFamily).toContain('Miltonian Tattoo');
+    });
+
+    it('should navigate to dashboard when logo is clicked', () => {
+      const logoContainer = fixture.debugElement.query(By.css('.logo-link'));
+      logoContainer.nativeElement.click();
+
+      expect(router.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
     });
   });
 });
