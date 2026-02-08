@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Miltonian+Tattoo&display=swap");
+
 // Colors
 $primary-color: #4f46e5;
 $primary-hover: #4338ca;
@@ -27,6 +29,8 @@ $font-sm: 0.875rem; // 14px
 $font-md: 1rem; // 16px
 $font-lg: 1.125rem; // 18px
 $font-xl: 1.5rem; // 24px
+$font-logo-lg: 3rem;
+$font-logo-sm: 1.8rem;
 
 // Font Weights
 $font-normal: 400;
@@ -42,3 +46,6 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 // Transitions
 $transition-fast: 150ms ease-in-out;
 $transition-normal: 300ms ease-in-out;
+
+// Typography
+$font-logo: "Miltonian Tattoo", cursive;

@@ -1,5 +1,23 @@
 @use "variables" as v;
 
+// Logo Container
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0 1rem 0;
+
+  .logo-text {
+    font-family: v.$font-logo;
+    font-size: v.$font-logo-lg;
+    font-weight: 400;
+    color: v.$primary-color;
+    margin: 0;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+}
+
 // Auth Container (centers the form)
 .register-container,
 .login-container {
