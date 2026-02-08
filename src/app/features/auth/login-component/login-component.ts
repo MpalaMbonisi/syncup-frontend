@@ -10,11 +10,10 @@ import {
   VALIDATION,
 } from '../../../core/constants/app.constants';
 import { Router, RouterLink } from '@angular/router';
-import { LogoComponent } from '../../../shared/components/logo-component/logo-component';
 
 @Component({
   selector: 'app-login-component',
-  imports: [CommonModule, ReactiveFormsModule, FooterComponent, RouterLink, LogoComponent],
+  imports: [CommonModule, ReactiveFormsModule, FooterComponent, RouterLink],
   templateUrl: './login-component.html',
   styleUrl: './login-component.scss',
 })

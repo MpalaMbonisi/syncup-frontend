@@ -9,11 +9,9 @@ import {
   SUCCESS_MESSAGES,
   VALIDATION,
 } from '../../../core/constants/app.constants';
-import { LogoComponent } from '../../../shared/components/logo-component/logo-component';
-
 @Component({
   selector: 'app-register-component',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent, LogoComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent],
   templateUrl: './register-component.html',
   styleUrl: './register-component.scss',
 })
