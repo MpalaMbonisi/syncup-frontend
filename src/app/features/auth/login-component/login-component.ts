@@ -52,6 +52,7 @@ export class LoginComponent {
           this.router.navigate([ROUTES.DASHBOARD]);
         },
         error: error => {
+          this.isLoading = false; // Reset loading state on error
           if (error.error && error.error.message) {
             this.errorMessage = Array.isArray(error.error.message)
               ? error.error.message.join(', ')

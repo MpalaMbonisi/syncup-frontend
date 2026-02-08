@@ -9,6 +9,7 @@ import {
   SUCCESS_MESSAGES,
   VALIDATION,
 } from '../../../core/constants/app.constants';
+
 @Component({
   selector: 'app-register-component',
   imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent],
@@ -69,12 +70,14 @@ export class RegisterComponent {
       delete userData.confirmPassword;
 
       this.authService.register(userData).subscribe({
-        next: () => {
+        next: response => {
+          console.log(response.message);
           this.isLoading = false;
           this.successMessage = SUCCESS_MESSAGES.REGISTRATION_SUCCESS;
           this.registerForm.reset();
         },
         error: error => {
+          this.isLoading = false; // Reset loading state on error
           if (error.error && error.error.message) {
             this.errorMessage = Array.isArray(error.error.message)
               ? error.error.message.join(', ')
