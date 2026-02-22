@@ -392,4 +392,142 @@ describe('HeaderComponent', () => {
       expect(component.isSettingsModalOpen).toBeFalse();
     });
   });
+
+  describe('Delete Account Functionality', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+    });
+
+    it('should display delete account button', () => {
+      const deleteButton = fixture.debugElement.query(By.css('.delete-account-btn'));
+      expect(deleteButton).toBeTruthy();
+      expect(deleteButton.nativeElement.textContent).toContain('Delete Account');
+    });
+
+    it('should show confirmation dialog when delete button is clicked', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      const deleteButton = fixture.debugElement.query(By.css('.delete-account-btn'));
+      deleteButton.nativeElement.click();
+
+      expect(window.confirm).toHaveBeenCalledWith(
+        jasmine.stringContaining('Are you sure you want to delete your account?')
+      );
+    });
+
+    it('should not delete account if user cancels confirmation', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      component.deleteAccount();
+
+      expect(accountService.deleteAccount).not.toHaveBeenCalled();
+    });
+
+    it('should delete account if user confirms', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      accountService.deleteAccount.and.returnValue(of(undefined));
+
+      component.deleteAccount();
+
+      expect(accountService.deleteAccount).toHaveBeenCalled();
+    });
+
+    it('should set deleting state to true while deleting', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      const deleteSubject = new Subject<void>();
+      accountService.deleteAccount.and.returnValue(deleteSubject.asObservable());
+
+      component.deleteAccount();
+      fixture.detectChanges();
+
+      // The state should be true while the subject hasn't emitted
+      expect(component.isDeletingAccount).toBeTrue();
+
+      deleteSubject.next();
+      deleteSubject.complete();
+      expect(component.isDeletingAccount).toBeFalse();
+    });
+
+    it('should show success message after successful deletion', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      accountService.deleteAccount.and.returnValue(of(undefined));
+
+      component.deleteAccount();
+
+      expect(window.alert).toHaveBeenCalledWith('Your account has been deleted successfully.');
+    });
+
+    it('should logout after successful deletion', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      spyOn(component, 'logout');
+      accountService.deleteAccount.and.returnValue(of(undefined));
+
+      component.deleteAccount();
+
+      expect(component.logout).toHaveBeenCalled();
+    });
+
+    it('should reset deleting state after successful deletion', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      accountService.deleteAccount.and.returnValue(of(undefined));
+
+      component.deleteAccount();
+
+      expect(component.isDeletingAccount).toBeFalse();
+    });
+
+    it('should handle delete error gracefully', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      accountService.deleteAccount.and.returnValue(
+        throwError(() => ({ error: { message: 'Failed to delete' } }))
+      );
+
+      component.deleteAccount();
+
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete');
+      expect(component.isDeletingAccount).toBeFalse();
+    });
+
+    it('should show generic error message when error format is unexpected', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      accountService.deleteAccount.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.deleteAccount();
+
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete account. Please try again.');
+    });
+
+    it('should disable delete button while deleting', () => {
+      component.isDeletingAccount = true;
+      fixture.detectChanges();
+
+      const deleteButton = compiled.querySelector('.delete-account-btn') as HTMLButtonElement;
+      expect(deleteButton.disabled).toBeTrue();
+    });
+
+    it('should show "Deleting..." text while deleting', () => {
+      component.isDeletingAccount = true;
+      fixture.detectChanges();
+
+      const deleteButton = compiled.querySelector('.delete-account-btn');
+      expect(deleteButton!.textContent).toContain('Deleting...');
+    });
+
+    it('should show "Delete Account" text when not deleting', () => {
+      component.isDeletingAccount = false;
+      fixture.detectChanges();
+
+      const deleteButton = compiled.querySelector('.delete-account-btn');
+      expect(deleteButton!.textContent).toContain('Delete Account');
+    });
+  });
 });
