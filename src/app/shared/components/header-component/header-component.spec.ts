@@ -177,10 +177,28 @@ describe('HeaderComponent', () => {
     });
 
     it('should not close modal when modal content is clicked', () => {
-      const modalContent = fixture.debugElement.query(By.css('.modal-content'));
-      modalContent.nativeElement.click();
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
 
+      const event = new MouseEvent('click');
+      spyOn(event, 'stopPropagation');
+
+      component.onModalContentClick(event);
+
+      expect(event.stopPropagation).toHaveBeenCalled();
+      // Ensure the variable that controls the modal visibility is still true
       expect(component.isSettingsModalOpen).toBeTrue();
+    });
+
+    it('should toggle button text based on deleting state', () => {
+      component.isDeletingAccount = true;
+      fixture.detectChanges();
+      const btn = fixture.debugElement.query(By.css('.delete-account-btn')).nativeElement;
+      expect(btn.textContent).toContain('Deleting...');
+
+      component.isDeletingAccount = false;
+      fixture.detectChanges();
+      expect(btn.textContent).toContain('Delete Account');
     });
   });
 
