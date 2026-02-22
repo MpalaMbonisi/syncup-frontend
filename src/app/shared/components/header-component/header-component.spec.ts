@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderComponent } from './header-component';
 import { provideRouter, Router } from '@angular/router';
 import { AccountService, UserResponseDTO } from '../../../core/services/account-service';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { ROUTES } from '../../../core/constants/app.constants';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -275,6 +275,80 @@ describe('HeaderComponent', () => {
     it('should display all info rows', () => {
       const infoRows = compiled.querySelectorAll('.info-row');
       expect(infoRows.length).toBe(4); // username, firstName, lastName, email
+    });
+  });
+
+  describe('Account Details Error Handling', () => {
+    it('should display error message when fetch fails', () => {
+      accountService.getAccountDetails.and.returnValue(
+        throwError(() => ({ status: 500, error: { message: 'Server error' } }))
+      );
+
+      fixture.detectChanges();
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      expect(component.accountDetailsError).toBe('Failed to load account details');
+
+      const errorContainer = compiled.querySelector('.error-container');
+      const errorText = compiled.querySelector('.error-text');
+
+      expect(errorContainer).toBeTruthy();
+      expect(errorText!.textContent).toContain('Failed to load account details');
+    });
+
+    it('should display retry button on error', () => {
+      accountService.getAccountDetails.and.returnValue(
+        throwError(() => ({ status: 500, error: { message: 'Server error' } }))
+      );
+
+      fixture.detectChanges();
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      const retryButton = compiled.querySelector('.retry-btn');
+      expect(retryButton).toBeTruthy();
+      expect(retryButton!.textContent).toContain('Retry');
+    });
+
+    it('should reload account details when retry button is clicked', () => {
+      accountService.getAccountDetails.and.returnValue(
+        throwError(() => ({ status: 500, error: { message: 'Server error' } }))
+      );
+
+      fixture.detectChanges();
+
+      // Reset spy and return success
+      accountService.getAccountDetails.calls.reset();
+      accountService.getAccountDetails.and.returnValue(of(mockAccountDetails));
+
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      const retryButton = compiled.querySelector('.retry-btn') as HTMLButtonElement;
+      retryButton.click();
+
+      expect(accountService.getAccountDetails).toHaveBeenCalled();
+    });
+
+    it('should redirect to login on 401 error', () => {
+      accountService.getAccountDetails.and.returnValue(
+        throwError(() => ({ status: 401, error: { message: 'Unauthorized' } }))
+      );
+
+      fixture.detectChanges();
+
+      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should set loading state to false after error', () => {
+      accountService.getAccountDetails.and.returnValue(
+        throwError(() => ({ status: 500, error: { message: 'Server error' } }))
+      );
+
+      fixture.detectChanges();
+
+      expect(component.isLoadingAccountDetails).toBeFalse();
     });
   });
 });
