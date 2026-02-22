@@ -11,7 +11,7 @@ describe('HeaderComponent', () => {
   let fixture: ComponentFixture<HeaderComponent>;
   let router: jasmine.SpyObj<Router>;
   let accountService: jasmine.SpyObj<AccountService>;
-  // let compiled: HTMLElement;
+  let compiled: HTMLElement;
 
   const mockAccountDetails: UserResponseDTO = {
     id: 1,
@@ -45,7 +45,7 @@ describe('HeaderComponent', () => {
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
-    // compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
   });
 
   describe('Component Initialization', () => {
@@ -99,6 +99,35 @@ describe('HeaderComponent', () => {
       logoContainer.nativeElement.click();
 
       expect(router.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
+    });
+  });
+
+  describe('Settings Button', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should display settings button', () => {
+      const settingsButton = compiled.querySelector('.settings-btn');
+
+      expect(settingsButton).toBeTruthy();
+      expect(settingsButton!.textContent).toContain('Settings');
+    });
+
+    it('should open settings modal when clicked', () => {
+      expect(component.isSettingsModalOpen).toBeFalse();
+
+      const settingsButton = fixture.debugElement.query(By.css('.settings-btn'));
+      settingsButton.nativeElement.click();
+
+      expect(component.isSettingsModalOpen).toBeTrue();
+    });
+
+    it('should display settings icon', () => {
+      const settingsButton = fixture.debugElement.query(By.css('.settings-btn'));
+      const icon = settingsButton.nativeElement.querySelector('svg');
+
+      expect(icon).toBeTruthy();
     });
   });
 });
