@@ -130,4 +130,56 @@ describe('HeaderComponent', () => {
       expect(icon).toBeTruthy();
     });
   });
+
+  describe('Settings Modal', () => {
+    beforeEach(() => {
+      component.username = 'johndoe';
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+    });
+
+    it('should display modal when isSettingsModalOpen is true', () => {
+      const modal = fixture.debugElement.query(By.css('.settings-modal'));
+      expect(modal).toBeTruthy();
+    });
+
+    it('should not display modal when isSettingsModalOpen is false', () => {
+      component.isSettingsModalOpen = false;
+      fixture.detectChanges();
+
+      const modal = fixture.debugElement.query(By.css('.settings-modal'));
+      expect(modal).toBeNull();
+    });
+
+    it('should display modal title', () => {
+      const modalTitle = fixture.debugElement.query(By.css('.modal-title'));
+      expect(modalTitle.nativeElement.textContent).toContain('Settings');
+    });
+
+    it('should have close button', () => {
+      const closeButton = fixture.debugElement.query(By.css('.close-modal-btn'));
+      expect(closeButton).toBeTruthy();
+    });
+
+    it('should close modal when close button is clicked', () => {
+      const closeButton = fixture.debugElement.query(By.css('.close-modal-btn'));
+      closeButton.nativeElement.click();
+
+      expect(component.isSettingsModalOpen).toBeFalse();
+    });
+
+    it('should close modal when backdrop is clicked', () => {
+      const backdrop = fixture.debugElement.query(By.css('.modal-backdrop'));
+      backdrop.nativeElement.click();
+
+      expect(component.isSettingsModalOpen).toBeFalse();
+    });
+
+    it('should not close modal when modal content is clicked', () => {
+      const modalContent = fixture.debugElement.query(By.css('.modal-content'));
+      modalContent.nativeElement.click();
+
+      expect(component.isSettingsModalOpen).toBeTrue();
+    });
+  });
 });
