@@ -2,9 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderComponent } from './header-component';
 import { provideRouter, Router } from '@angular/router';
 import { AccountService, UserResponseDTO } from '../../../core/services/account-service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { ROUTES } from '../../../core/constants/app.constants';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -180,6 +181,62 @@ describe('HeaderComponent', () => {
       modalContent.nativeElement.click();
 
       expect(component.isSettingsModalOpen).toBeTrue();
+    });
+  });
+
+  describe('Account Details Loading', () => {
+    it('should display loading state while fetching account details', () => {
+      const accountSubject = new Subject<UserResponseDTO>();
+      accountService.getAccountDetails.and.returnValue(accountSubject.asObservable());
+
+      component.loadAccountDetails();
+      component.isSettingsModalOpen = true;
+
+      fixture.detectChanges();
+
+      const loadingContainer = fixture.debugElement.query(By.css('.loading-container'));
+      const spinner = fixture.debugElement.query(By.css('.spinner'));
+
+      expect(loadingContainer).toBeTruthy(); // Should now be found
+      expect(spinner).toBeTruthy();
+
+      accountSubject.next(mockAccountDetails);
+      accountSubject.complete();
+    });
+
+    it('should display error message when loading fails', () => {
+      const errorSubject = new Subject<UserResponseDTO>();
+      accountService.getAccountDetails.and.returnValue(errorSubject.asObservable());
+
+      component.isSettingsModalOpen = true;
+      component.loadAccountDetails();
+
+      const mockError = new HttpErrorResponse({
+        error: { message: 'Internal Server Error' },
+        status: 500,
+        statusText: 'Server Error',
+      });
+
+      errorSubject.error(mockError);
+      fixture.detectChanges();
+
+      const errorContainer = fixture.debugElement.query(By.css('.error-container'));
+
+      expect(errorContainer).toBeTruthy();
+      expect(component.accountDetailsError).toBe('Failed to load account details');
+      expect(component.isLoadingAccountDetails).toBeFalse();
+    });
+
+    it('should set loading state to false after successful fetch', () => {
+      fixture.detectChanges();
+
+      expect(component.isLoadingAccountDetails).toBeFalse();
+    });
+
+    it('should store account details after successful fetch', () => {
+      fixture.detectChanges();
+
+      expect(component.accountDetails).toEqual(mockAccountDetails);
     });
   });
 });
