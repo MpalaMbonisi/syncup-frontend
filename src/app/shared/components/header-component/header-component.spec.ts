@@ -239,4 +239,42 @@ describe('HeaderComponent', () => {
       expect(component.accountDetails).toEqual(mockAccountDetails);
     });
   });
+
+  describe('Account Details Display', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+    });
+
+    it('should display account information section', () => {
+      const accountSection = fixture.debugElement.query(By.css('.account-info'));
+      expect(accountSection).toBeTruthy();
+    });
+
+    it('should display username', () => {
+      const detailsContainer = compiled.querySelector('.details-container');
+      expect(detailsContainer!.textContent).toContain('johndoe');
+    });
+
+    it('should display first name', () => {
+      const detailsContainer = compiled.querySelector('.details-container');
+      expect(detailsContainer!.textContent).toContain('John');
+    });
+
+    it('should display last name', () => {
+      const detailsContainer = compiled.querySelector('.details-container');
+      expect(detailsContainer!.textContent).toContain('Doe');
+    });
+
+    it('should display email', () => {
+      const detailsContainer = compiled.querySelector('.details-container');
+      expect(detailsContainer!.textContent).toContain('john.doe@example.com');
+    });
+
+    it('should display all info rows', () => {
+      const infoRows = compiled.querySelectorAll('.info-row');
+      expect(infoRows.length).toBe(4); // username, firstName, lastName, email
+    });
+  });
 });
