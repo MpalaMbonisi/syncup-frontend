@@ -4,7 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { AccountService, UserResponseDTO } from '../../../core/services/account-service';
 import { of, Subject, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { ROUTES } from '../../../core/constants/app.constants';
+import { ROUTES, STORAGE_KEYS } from '../../../core/constants/app.constants';
 import { HttpErrorResponse } from '@angular/common/http';
 
 describe('HeaderComponent', () => {
@@ -349,6 +349,47 @@ describe('HeaderComponent', () => {
       fixture.detectChanges();
 
       expect(component.isLoadingAccountDetails).toBeFalse();
+    });
+  });
+
+  describe('Logout Functionality', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'mock-token');
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, '{"username":"test"}');
+      fixture.detectChanges();
+    });
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('should display logout button', () => {
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      const logoutButton = fixture.debugElement.query(By.css('.logout-btn'));
+      expect(logoutButton).toBeTruthy();
+      expect(logoutButton.nativeElement.textContent).toContain('Logout');
+    });
+
+    it('should clear localStorage on logout', () => {
+      component.logout();
+
+      expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEYS.USER_DATA)).toBeNull();
+    });
+
+    it('should navigate to login page on logout', () => {
+      component.logout();
+
+      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should close modal on logout', () => {
+      component.isSettingsModalOpen = true;
+      component.logout();
+
+      expect(component.isSettingsModalOpen).toBeFalse();
     });
   });
 });
