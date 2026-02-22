@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { Router } from '@angular/router';
@@ -8,7 +7,7 @@ import { TaskListResponseDTO, TaskListService } from '../../core/services/task-l
 
 @Component({
   selector: 'app-dashboard-component',
-  imports: [CommonModule, FooterComponent],
+  imports: [FooterComponent],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.scss',
 })

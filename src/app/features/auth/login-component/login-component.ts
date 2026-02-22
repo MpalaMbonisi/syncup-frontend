@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FooterComponent } from '../../../shared/components/footer-component/footer-component';
@@ -13,7 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login-component',
-  imports: [CommonModule, ReactiveFormsModule, FooterComponent, RouterLink],
+  imports: [ReactiveFormsModule, FooterComponent, RouterLink],
   templateUrl: './login-component.html',
   styleUrl: './login-component.scss',
 })

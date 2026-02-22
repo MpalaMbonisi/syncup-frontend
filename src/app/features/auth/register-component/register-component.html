@@ -6,7 +6,9 @@
   <h2>Create Account</h2>
 
   <!-- Error Message -->
-  <div *ngIf="errorMessage" class="error-message-box">{{ errorMessage }}</div>
+  @if (errorMessage) {
+  <div class="error-message-box">{{ errorMessage }}</div>
+  }
 
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
@@ -17,12 +19,9 @@
         id="firstName"
         [class.error]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
       />
-      <div
-        *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
-        class="error-message"
-      >
-        First name is required
-      </div>
+      @if (registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched) {
+      <div class="error-message">First name is required</div>
+      }
     </div>
 
     <div class="form-group">
@@ -33,9 +32,9 @@
         formControlName="lastName"
         [class.error]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
       />
-      <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="error-message">
-        Last name is required
-      </div>
+      @if (registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched) {
+      <div class="error-message">Last name is required</div>
+      }
     </div>
 
     <div class="form-group">
@@ -46,9 +45,9 @@
         formControlName="username"
         [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
       />
-      <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error-message">
-        Username is required
-      </div>
+      @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+      <div class="error-message">Username is required</div>
+      }
     </div>
 
     <div class="form-group">
@@ -59,10 +58,15 @@
         formControlName="email"
         [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
       />
-      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
-        <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
-        <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+      <div class="error-message">
+        @if (registerForm.get('email')?.errors?.['required']) {
+        <span>Email is required</span>
+        } @if (registerForm.get('email')?.errors?.['email']) {
+        <span>Please enter a valid email</span>
+        }
       </div>
+      }
     </div>
 
     <div class="form-group">
@@ -78,10 +82,15 @@
           {{ showPassword ? 'Hide' : 'Show' }}
         </button>
       </div>
-      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
-        <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
-        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+      <div class="error-message">
+        @if (registerForm.get('password')?.errors?.['required']) {
+        <span>Password is required</span>
+        } @if (registerForm.get('password')?.errors?.['minlength']) {
+        <span>Password must be at least 8 characters</span>
+        }
       </div>
+      }
     </div>
 
     <div class="form-group">
@@ -97,18 +106,11 @@
           {{ showConfirmPassword ? 'Hide' : 'Show' }}
         </button>
       </div>
-      <div
-        *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
-        class="error-message"
-      >
-        Confirm password is required
-      </div>
-      <div
-        *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched"
-        class="error-message"
-      >
-        Passwords do not match
-      </div>
+      @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+      <div class="error-message">Confirm password is required</div>
+      } @if (registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched) {
+      <div class="error-message">Passwords do not match</div>
+      }
     </div>
 
     <button type="submit" [disabled]="registerForm.invalid || isLoading">
@@ -117,7 +119,9 @@
   </form>
 
   <!-- Success Message -->
-  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+  @if (successMessage) {
+  <div class="success-message">{{ successMessage }}</div>
+  }
 
   <div class="login-prompt">Already have an account? <a routerLink="/login">Log in here</a></div>
 </div>
