@@ -1,0 +1,311 @@
+@use "../../../../styles/variables" as v;
+@import url("https://fonts.googleapis.com/css2?family=Miltonian+Tattoo&display=swap");
+
+.header {
+  background-color: v.$white;
+  border-bottom: 1px solid v.$border-color;
+  box-shadow: v.$shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: v.$spacing-md v.$spacing-lg;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// Logo Section
+.logo-link {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: opacity v.$transition-fast;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  .logo-text {
+    font-family: "Miltonian Tattoo", cursive;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: v.$primary-color;
+    margin: 0;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+}
+
+// Settings Button
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-xs;
+  padding: v.$spacing-xs v.$spacing-md;
+  font-size: v.$font-sm;
+  font-weight: v.$font-medium;
+  color: v.$text-secondary;
+  background-color: v.$white;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius-md;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    color: v.$primary-color;
+    border-color: v.$primary-color;
+    background-color: #faf5ff;
+  }
+}
+
+// Settings Modal
+.settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+
+  .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: v.$spacing-lg;
+  }
+
+  .modal-content {
+    background-color: v.$white;
+    border-radius: v.$border-radius-lg;
+    box-shadow: v.$shadow-lg;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// Modal Header
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: v.$spacing-lg;
+  border-bottom: 1px solid v.$border-color;
+
+  .modal-title {
+    font-size: v.$font-xl;
+    font-weight: v.$font-bold;
+    color: v.$text-primary;
+    margin: 0;
+  }
+
+  .close-modal-btn {
+    background: none;
+    border: none;
+    color: v.$text-secondary;
+    cursor: pointer;
+    padding: v.$spacing-xs;
+    border-radius: v.$border-radius-sm;
+    transition: all v.$transition-fast;
+
+    &:hover {
+      background-color: v.$background-light;
+      color: v.$text-primary;
+    }
+
+    svg {
+      display: block;
+    }
+  }
+}
+
+// Modal Body
+.modal-body {
+  padding: v.$spacing-lg;
+}
+
+// Account Information Section
+.account-info {
+  margin-bottom: v.$spacing-xl;
+
+  .section-title {
+    font-size: v.$font-lg;
+    font-weight: v.$font-semibold;
+    color: v.$text-primary;
+    margin-bottom: v.$spacing-md;
+  }
+
+  // Loading State
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: v.$spacing-xl 0;
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid v.$border-color;
+      border-top-color: v.$primary-color;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: v.$spacing-sm;
+    }
+
+    .loading-text {
+      font-size: v.$font-sm;
+      color: v.$text-secondary;
+      margin: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  // Error State
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: v.$spacing-lg 0;
+
+    .error-text {
+      font-size: v.$font-sm;
+      color: v.$error-color;
+      margin: 0 0 v.$spacing-md 0;
+    }
+
+    .retry-btn {
+      padding: v.$spacing-xs v.$spacing-md;
+      font-size: v.$font-sm;
+      font-weight: v.$font-medium;
+      color: v.$primary-color;
+      background-color: v.$white;
+      border: 1px solid v.$primary-color;
+      border-radius: v.$border-radius-md;
+      cursor: pointer;
+      transition: all v.$transition-fast;
+
+      &:hover {
+        background-color: v.$primary-color;
+        color: v.$white;
+      }
+    }
+  }
+
+  // Account Details
+  .details-container {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-sm;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    padding: v.$spacing-sm v.$spacing-md;
+    background-color: v.$background-light;
+    border-radius: v.$border-radius-md;
+
+    .info-label {
+      font-size: v.$font-sm;
+      font-weight: v.$font-medium;
+      color: v.$text-secondary;
+      min-width: 100px;
+    }
+
+    .info-value {
+      font-size: v.$font-md;
+      font-weight: v.$font-medium;
+      color: v.$text-primary;
+      word-break: break-word;
+    }
+  }
+}
+
+// Action Buttons Section
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-md;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: v.$spacing-sm;
+    padding: v.$spacing-sm v.$spacing-lg;
+    font-size: v.$font-md;
+    font-weight: v.$font-medium;
+    border: none;
+    border-radius: v.$border-radius-md;
+    cursor: pointer;
+    transition: all v.$transition-fast;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .logout-btn {
+    color: v.$white;
+    background-color: v.$primary-color;
+
+    &:hover {
+      background-color: v.$primary-hover;
+    }
+  }
+
+  .delete-account-btn {
+    color: v.$error-color;
+    background-color: #fef2f2;
+    border: 1px solid v.$error-color;
+
+    &:hover:not(:disabled) {
+      background-color: v.$error-color;
+      color: v.$white;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
