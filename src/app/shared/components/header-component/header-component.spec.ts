@@ -530,4 +530,31 @@ describe('HeaderComponent', () => {
       expect(deleteButton!.textContent).toContain('Delete Account');
     });
   });
+
+  describe('Accessibility', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should have proper ARIA labels on settings button', () => {
+      const settingsButton = fixture.debugElement.query(By.css('.settings-btn'));
+      expect(settingsButton.nativeElement.getAttribute('aria-label')).toBe('Open settings');
+    });
+
+    it('should have proper role on modal', () => {
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      const modal = fixture.debugElement.query(By.css('.settings-modal'));
+      expect(modal.nativeElement.getAttribute('role')).toBe('dialog');
+    });
+
+    it('should have aria-modal on modal', () => {
+      component.isSettingsModalOpen = true;
+      fixture.detectChanges();
+
+      const modal = fixture.debugElement.query(By.css('.settings-modal'));
+      expect(modal.nativeElement.getAttribute('aria-modal')).toBe('true');
+    });
+  });
 });
