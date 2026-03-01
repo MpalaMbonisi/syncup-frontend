@@ -6,7 +6,8 @@ import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
 import { of, Subject } from 'rxjs';
 import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { StorageService } from '../../core/services/storage-service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -76,6 +77,8 @@ describe('DashboardComponent', () => {
         { provide: TaskListService, useValue: mockTaskListService },
         { provide: StorageService, useValue: mockStorageService },
         provideRouter([]),
+        provideHttpClientTesting(),
+        provideHttpClient(),
       ],
     }).compileComponents();
   });
