@@ -1,13 +1,17 @@
+// dashboard-component.ts
 import { Component, inject, OnInit } from '@angular/core';
 import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FooterComponent } from '../../shared/components/footer-component/footer-component';
+import { HeaderComponent } from '../../shared/components/header-component/header-component';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
 import { TaskListResponseDTO, TaskListService } from '../../core/services/task-list-service';
+import { StorageService } from '../../core/services/storage-service';
 
 @Component({
   selector: 'app-dashboard-component',
-  imports: [FooterComponent],
+  imports: [FooterComponent, HeaderComponent],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.scss',
 })
@@ -15,23 +19,23 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private jwtDecoder = inject(JwtDecoderService);
   private taskListService = inject(TaskListService);
+  private storageService = inject(StorageService);
 
   username: string = '';
   isTokenExpired: boolean = false;
   taskLists: TaskListResponseDTO[] = [];
   isLoading: boolean = false;
   errorMessage: string = '';
+  viewMode: 'grid' | 'list' = 'grid';
 
   ngOnInit(): void {
     this.loadUserInfo();
     this.loadTaskLists();
+    this.loadViewPreference();
   }
 
-  /**
-   * Load user information from JWT token
-   */
   private loadUserInfo(): void {
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    const token = this.storageService.getItem(STORAGE_KEYS.AUTH_TOKEN);
 
     if (!token) {
       console.warn('No token found, redirecting to login');
@@ -54,40 +58,30 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // Set username
     this.username = this.capitalizeFirstLetter(user.username);
 
-    // Optional: Store user data for later use
     const userData = {
       username: user.username,
       issuedAt: user.issuedAt.toISOString(),
       expiresAt: user.expiresAt.toISOString(),
     };
-    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
-
-    console.log('User loaded:', this.username);
-    console.log('Token expires at:', user.expiresAt);
+    this.storageService.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
   }
 
-  /**
-   * Load all task lists for the current user
-   */
   public loadTaskLists(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
     this.taskListService.getAllLists().subscribe({
-      next: lists => {
+      next: (lists: TaskListResponseDTO[]) => {
         this.taskLists = lists;
         this.isLoading = false;
-        console.log('Task lists loaded:', lists.length);
       },
-      error: error => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error loading task lists:', error);
         this.errorMessage = 'Failed to load task lists. Please try again.';
         this.isLoading = false;
 
-        // If unauthorized, redirect to login
         if (error.status === 401) {
           this.logout();
         }
@@ -95,41 +89,62 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  /**
-   * Get the count of incomplete tasks for a list
-   */
   getIncompleteTaskCount(list: TaskListResponseDTO): number {
     return list.tasks.filter(task => !task.completed).length;
   }
 
-  /**
-   * Get the count of completed tasks for a list
-   */
   getCompletedTaskCount(list: TaskListResponseDTO): number {
     return list.tasks.filter(task => task.completed).length;
   }
 
-  /**
-   * Check if the current user is the owner of a list
-   */
+  getTotalCompletedTasks(): number {
+    return this.taskLists.reduce((total, list) => total + this.getCompletedTaskCount(list), 0);
+  }
+
+  getTotalPendingTasks(): number {
+    return this.taskLists.reduce((total, list) => total + this.getIncompleteTaskCount(list), 0);
+  }
+
+  getTotalCollaborations(): number {
+    return this.taskLists.filter(list => !this.isOwner(list)).length;
+  }
+
   isOwner(list: TaskListResponseDTO): boolean {
     return list.owner.toLowerCase() === this.username.toLowerCase();
   }
 
-  /**
-   * Capitalize first letter of username for display
-   */
+  setViewMode(mode: 'grid' | 'list'): void {
+    this.viewMode = mode;
+    this.storageService.setItem('dashboardViewMode', mode);
+  }
+
+  private loadViewPreference(): void {
+    const savedMode = this.storageService.getItem('dashboardViewMode') as 'grid' | 'list' | null;
+    if (savedMode === 'grid' || savedMode === 'list') {
+      this.viewMode = savedMode;
+    }
+  }
+
+  viewList(list: TaskListResponseDTO): void {
+    console.log('Viewing list:', list.id);
+  }
+
+  openListMenu(list: TaskListResponseDTO): void {
+    console.log('Opening menu for list:', list.id);
+  }
+
+  createNewList(): void {
+    console.log('Creating new task list');
+  }
+
   private capitalizeFirstLetter(text: string): string {
     if (!text) return '';
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
-  /**
-   * Logout user and clear storage
-   */
   logout(): void {
-    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    this.storageService.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    this.storageService.removeItem(STORAGE_KEYS.USER_DATA);
     this.router.navigate([ROUTES.LOGIN]);
   }
 }
