@@ -257,4 +257,24 @@ describe('DashboardComponent', () => {
       expect(component.isOwner(capitalizedOwnerList)).toBe(true);
     });
   });
+
+  describe('Logout', () => {
+    beforeEach(() => {
+      mockStorageService.getItem.mockReturnValue('mock-token-12345');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockValidUser);
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should remove token from StorageService and navigate on logout', () => {
+      component.logout();
+
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+  });
 });
