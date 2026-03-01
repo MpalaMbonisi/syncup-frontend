@@ -17,6 +17,12 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Silences console.error but keeps the test passing/failing logic intact
+jest.spyOn(console, 'error').mockImplementation((message) => {
+  // Optional: You can filter for specific messages to silence
+  if (message.includes('Failed to load account details')) return;
+});
+
 // Mock localStorage if not provided by JSDOM
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
