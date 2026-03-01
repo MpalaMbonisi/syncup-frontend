@@ -11,40 +11,40 @@
   .header-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: v.$spacing-md v.$spacing-lg;
+    padding: 0 1.5rem;
+
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    height: 70px;
+    position: relative;
   }
 }
 
 // Logo Section
 .logo-link {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
   background: none;
   border: none;
   padding: 0;
-  text-align: left;
-  font: inherit;
   cursor: pointer;
-  transition: opacity v.$transition-fast;
-
-  &:hover {
-    opacity: 0.8;
-  }
+  z-index: 2;
 
   .logo-text {
     font-family: v.$font-logo;
     font-size: 1.75rem;
-    font-weight: 400;
     color: v.$primary-color;
     margin: 0;
-    letter-spacing: 0.05em;
-    user-select: none;
   }
 }
 
 // Settings Button
 .settings-btn {
+  margin-left: auto;
+  z-index: 1;
+
   display: flex;
   align-items: center;
   gap: v.$spacing-xs;
