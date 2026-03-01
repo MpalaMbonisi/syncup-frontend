@@ -1,11 +1,12 @@
 import { DashboardComponent } from './dashboard-component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaskListService } from '../../core/services/task-list-service';
+import { TaskListResponseDTO, TaskListService } from '../../core/services/task-list-service';
 import { provideRouter, Router } from '@angular/router';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { StorageService } from '../../core/services/storage-service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -33,6 +34,28 @@ describe('DashboardComponent', () => {
     expiresAt: new Date(Date.now() - 3600000),
     isExpired: true,
   };
+
+  const mockTaskLists: TaskListResponseDTO[] = [
+    {
+      id: 1,
+      title: 'Shopping List',
+      owner: 'johndoe',
+      collaborators: [],
+      tasks: [
+        { id: 1, description: 'Buy milk', completed: false, taskListTitle: 'Shopping List' },
+        { id: 2, description: 'Buy bread', completed: true, taskListTitle: 'Shopping List' },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Work Tasks',
+      owner: 'johndoe',
+      collaborators: ['janedoe'],
+      tasks: [
+        { id: 3, description: 'Finish report', completed: false, taskListTitle: 'Work Tasks' },
+      ],
+    },
+  ];
 
   beforeEach(async () => {
     mockRouter = { navigate: jest.fn() };
@@ -145,6 +168,65 @@ describe('DashboardComponent', () => {
         STORAGE_KEYS.USER_DATA,
         expect.any(String)
       );
+    });
+  });
+
+  describe('Task Lists Loading', () => {
+    let taskListSubject: Subject<TaskListResponseDTO[]>;
+
+    beforeEach(() => {
+      mockStorageService.getItem.mockReturnValue('mock-token-12345');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockValidUser);
+
+      taskListSubject = new Subject<TaskListResponseDTO[]>();
+      mockTaskListService.getAllLists.mockReturnValue(taskListSubject.asObservable());
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should load task lists on init', () => {
+      taskListSubject.next(mockTaskLists);
+      taskListSubject.complete();
+      fixture.detectChanges();
+
+      expect(mockTaskListService.getAllLists).toHaveBeenCalled();
+      expect(component.taskLists).toEqual(mockTaskLists);
+      expect(component.taskLists).toHaveLength(2);
+    });
+
+    it('should set isLoading to true while loading', () => {
+      expect(component.isLoading).toBe(true);
+      taskListSubject.next(mockTaskLists);
+      taskListSubject.complete();
+    });
+
+    it('should set isLoading to false after loading completes', () => {
+      taskListSubject.next(mockTaskLists);
+      taskListSubject.complete();
+      fixture.detectChanges();
+
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle error when loading task lists fails', () => {
+      const mockError = new HttpErrorResponse({ status: 500, statusText: 'Server error' });
+
+      taskListSubject.error(mockError);
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBe('Failed to load task lists. Please try again.');
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should redirect to login on 401 error', () => {
+      const mockError = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
+
+      taskListSubject.error(mockError);
+      fixture.detectChanges();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
   });
 });
