@@ -1,0 +1,122 @@
+@use "../../../styles/variables" as v;
+
+// ============================================
+// State Containers (Loading, Error, Empty)
+// ============================================
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-xl * 3;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: v.$border-radius-lg;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  h4 {
+    font-size: v.$font-xl;
+    font-weight: v.$font-bold;
+    color: v.$text-primary;
+    margin: v.$spacing-md 0 v.$spacing-sm 0;
+  }
+
+  p {
+    font-size: v.$font-md;
+    color: v.$text-secondary;
+    margin: 0 0 v.$spacing-lg 0;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  svg {
+    opacity: 0.6;
+  }
+
+  // Loading State
+  &.loading-state {
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(79, 70, 229, 0.1);
+      border-top-color: v.$primary-color;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: v.$spacing-lg;
+    }
+
+    p {
+      color: v.$text-secondary;
+      margin: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  // Error State
+  &.error-state {
+    svg {
+      color: v.$error-color;
+      margin-bottom: v.$spacing-md;
+    }
+
+    .btn-retry {
+      padding: v.$spacing-sm v.$spacing-xl;
+      font-size: v.$font-md;
+      font-weight: v.$font-semibold;
+      color: v.$white;
+      background: linear-gradient(135deg, v.$error-color, #dc2626);
+      border: none;
+      border-radius: v.$border-radius-md;
+      cursor: pointer;
+      transition: all v.$transition-fast;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      }
+    }
+  }
+
+  // Empty State
+  &.empty-state {
+    svg {
+      color: v.$text-secondary;
+      margin-bottom: v.$spacing-lg;
+    }
+
+    .btn-create-first {
+      display: flex;
+      align-items: center;
+      gap: v.$spacing-xs;
+      padding: v.$spacing-sm v.$spacing-xl;
+      font-size: v.$font-md;
+      font-weight: v.$font-semibold;
+      color: v.$white;
+      background: linear-gradient(135deg, v.$primary-color, #6366f1);
+      border: none;
+      border-radius: v.$border-radius-md;
+      cursor: pointer;
+      transition: all v.$transition-fast;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+
+      svg {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+        color: v.$white;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+      }
+    }
+  }
+}

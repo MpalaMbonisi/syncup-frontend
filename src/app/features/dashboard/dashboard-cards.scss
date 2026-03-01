@@ -1,0 +1,273 @@
+@use "../../../styles/variables" as v;
+
+// ============================================
+// Task Lists Container (Grid & List Views)
+// ============================================
+.task-lists-container {
+  // Grid View
+  &.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: v.$spacing-lg;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // List View
+  &.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-md;
+
+    .task-list-card {
+      .card-body {
+        display: flex;
+        align-items: center;
+        gap: v.$spacing-xl;
+        flex-wrap: wrap;
+
+        .task-stats-inline {
+          flex: 1;
+          min-width: 200px;
+        }
+
+        .progress-container {
+          flex: 2;
+          min-width: 250px;
+        }
+
+        .no-tasks-text {
+          margin: 0;
+        }
+      }
+
+      .card-footer {
+        .btn-view {
+          width: auto;
+          padding: v.$spacing-xs v.$spacing-lg;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// Task List Card
+// ============================================
+.task-list-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: v.$border-radius-lg;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all v.$transition-fast;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  }
+
+  // Card Header
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: v.$spacing-lg;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    .card-title-section {
+      flex: 1;
+
+      .card-title {
+        font-size: v.$font-lg;
+        font-weight: v.$font-bold;
+        color: v.$text-primary;
+        margin: 0 0 v.$spacing-sm 0;
+        word-break: break-word;
+      }
+
+      .badges {
+        display: flex;
+        gap: v.$spacing-xs;
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px v.$spacing-sm;
+          font-size: v.$font-xs;
+          font-weight: v.$font-semibold;
+          border-radius: v.$border-radius-sm;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          svg {
+            width: 12px;
+            height: 12px;
+          }
+
+          &.owner {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+          }
+
+          &.collaborator {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+          }
+        }
+      }
+    }
+
+    .card-menu-btn {
+      background: transparent;
+      border: none;
+      color: v.$text-secondary;
+      cursor: pointer;
+      padding: v.$spacing-xs;
+      border-radius: v.$border-radius-sm;
+      transition: all v.$transition-fast;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: v.$text-primary;
+      }
+    }
+  }
+
+  // Card Body
+  .card-body {
+    padding: v.$spacing-lg;
+
+    .task-stats-inline {
+      display: flex;
+      gap: v.$spacing-lg;
+      margin-bottom: v.$spacing-md;
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: v.$spacing-xs;
+        font-size: v.$font-sm;
+        color: v.$text-secondary;
+        font-weight: v.$font-medium;
+
+        svg {
+          width: 16px;
+          height: 16px;
+          color: v.$primary-color;
+        }
+      }
+    }
+
+    .progress-container {
+      margin-bottom: v.$spacing-sm;
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: v.$spacing-xs;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, v.$primary-color, v.$success-color);
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-text {
+        font-size: v.$font-xs;
+        color: v.$text-secondary;
+        font-weight: v.$font-semibold;
+      }
+    }
+
+    .no-tasks-text {
+      font-size: v.$font-sm;
+      color: v.$text-secondary;
+      font-style: italic;
+      margin: v.$spacing-md 0;
+    }
+  }
+
+  // Card Footer
+  .card-footer {
+    padding: v.$spacing-md v.$spacing-lg;
+    background: rgba(0, 0, 0, 0.02);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+    .btn-view {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: v.$spacing-xs;
+      width: 100%;
+      padding: v.$spacing-sm;
+      font-size: v.$font-sm;
+      font-weight: v.$font-semibold;
+      color: v.$primary-color;
+      background: transparent;
+      border: 2px solid v.$primary-color;
+      border-radius: v.$border-radius-md;
+      cursor: pointer;
+      transition: all v.$transition-fast;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        transition: transform v.$transition-fast;
+      }
+
+      &:hover {
+        background: v.$primary-color;
+        color: v.$white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+
+        svg {
+          transform: translateX(4px);
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-list-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+// Stagger animation for cards
+@for $i from 1 through 20 {
+  .task-list-card:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.05}s;
+  }
+}
