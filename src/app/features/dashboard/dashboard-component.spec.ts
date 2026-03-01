@@ -229,4 +229,32 @@ describe('DashboardComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
   });
+
+  describe('Task Statistics & Ownership', () => {
+    beforeEach(() => {
+      mockStorageService.getItem.mockReturnValue('mock-token-12345');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockValidUser);
+      mockTaskListService.getAllLists.mockReturnValue(of(mockTaskLists));
+
+      fixture = TestBed.createComponent(DashboardComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('should calculate task counts correctly', () => {
+      const list = mockTaskLists[0];
+      expect(component.getIncompleteTaskCount(list)).toBe(1);
+      expect(component.getCompletedTaskCount(list)).toBe(1);
+    });
+
+    it('should determine ownership accurately (case-insensitive)', () => {
+      const ownedList = mockTaskLists[0];
+      const unownedList: TaskListResponseDTO = { ...ownedList, owner: 'janedoe' };
+      const capitalizedOwnerList: TaskListResponseDTO = { ...ownedList, owner: 'JOHNDOE' };
+
+      expect(component.isOwner(ownedList)).toBe(true);
+      expect(component.isOwner(unownedList)).toBe(false);
+      expect(component.isOwner(capitalizedOwnerList)).toBe(true);
+    });
+  });
 });
