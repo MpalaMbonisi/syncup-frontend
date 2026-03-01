@@ -121,8 +121,8 @@ describe('TaskListService', () => {
 
       service.getAllLists().subscribe(response => {
         expect(response[0].tasks.length).toBe(2);
-        expect(response[0].tasks[0].completed).toBeFalse();
-        expect(response[0].tasks[1].completed).toBeTrue();
+        expect(response[0].tasks[0].completed).toBe(false);
+        expect(response[0].tasks[1].completed).toBe(true);
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/list/all`);
@@ -212,7 +212,7 @@ describe('TaskListService', () => {
       service.getListById(listId).subscribe({
         next: () => fail('should have failed with 403 error'),
         error: error => {
-          expect(error.status).toEqual(403);
+          expect(error.status).toBe(403);
           expect(error.error).toEqual(mockError);
         },
       });

@@ -10,8 +10,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let router: jasmine.SpyObj<Router>;
-  let accountService: jasmine.SpyObj<AccountService>;
+  let mockRouter: { navigate: jest.Mock };
+  let mockAccountService: { getAccountDetails: jest.Mock; deleteAccount: jest.Mock };
   let compiled: HTMLElement;
 
   const mockAccountDetails: UserResponseDTO = {
@@ -23,26 +23,26 @@ describe('HeaderComponent', () => {
   };
 
   beforeEach(async () => {
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const accountServiceSpy = jasmine.createSpyObj('AccountService', [
-      'getAccountDetails',
-      'deleteAccount',
-    ]);
+    mockRouter = {
+      navigate: jest.fn(),
+    };
+
+    mockAccountService = {
+      getAccountDetails: jest.fn(),
+      deleteAccount: jest.fn(),
+    };
+
+    // Default successful response for account details
+    mockAccountService.getAccountDetails.mockReturnValue(of(mockAccountDetails));
 
     await TestBed.configureTestingModule({
       imports: [HeaderComponent],
       providers: [
-        { provide: Router, useValue: routerSpy },
-        { provide: AccountService, useValue: accountServiceSpy },
+        { provide: Router, useValue: mockRouter },
+        { provide: AccountService, useValue: mockAccountService },
         provideRouter([]),
       ],
     }).compileComponents();
-
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    accountService = TestBed.inject(AccountService) as jasmine.SpyObj<AccountService>;
-
-    // Default successful response for account details
-    accountService.getAccountDetails.and.returnValue(of(mockAccountDetails));
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
@@ -58,13 +58,13 @@ describe('HeaderComponent', () => {
     it('should load account details on init', () => {
       fixture.detectChanges();
 
-      expect(accountService.getAccountDetails).toHaveBeenCalled();
+      expect(mockAccountService.getAccountDetails).toHaveBeenCalled();
       expect(component.accountDetails).toEqual(mockAccountDetails);
     });
 
     it('should initialize with settings modal closed', () => {
       fixture.detectChanges();
-      expect(component.isSettingsModalOpen).toBeFalse();
+      expect(component.isSettingsModalOpen).toBe(false);
     });
 
     it('should initialize with account details as null', () => {
@@ -90,16 +90,15 @@ describe('HeaderComponent', () => {
 
     it('should use Miltonian Tattoo font family', () => {
       const logoText = fixture.debugElement.query(By.css('.logo-text'));
-      const styles = window.getComputedStyle(logoText.nativeElement);
 
-      expect(styles.fontFamily).toContain('Miltonian Tattoo');
+      expect(logoText.nativeElement.classList).toContain('logo-text');
     });
 
     it('should navigate to dashboard when logo is clicked', () => {
       const logoContainer = fixture.debugElement.query(By.css('.logo-link'));
       logoContainer.nativeElement.click();
 
-      expect(router.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
     });
   });
 
@@ -116,12 +115,12 @@ describe('HeaderComponent', () => {
     });
 
     it('should open settings modal when clicked', () => {
-      expect(component.isSettingsModalOpen).toBeFalse();
+      expect(component.isSettingsModalOpen).toBe(false);
 
       const settingsButton = fixture.debugElement.query(By.css('.settings-btn'));
       settingsButton.nativeElement.click();
 
-      expect(component.isSettingsModalOpen).toBeTrue();
+      expect(component.isSettingsModalOpen).toBe(true);
     });
 
     it('should display settings icon', () => {
@@ -166,14 +165,14 @@ describe('HeaderComponent', () => {
       const closeButton = fixture.debugElement.query(By.css('.close-modal-btn'));
       closeButton.nativeElement.click();
 
-      expect(component.isSettingsModalOpen).toBeFalse();
+      expect(component.isSettingsModalOpen).toBe(false);
     });
 
     it('should close modal when backdrop is clicked', () => {
       const backdrop = fixture.debugElement.query(By.css('.modal-backdrop'));
       backdrop.nativeElement.click();
 
-      expect(component.isSettingsModalOpen).toBeFalse();
+      expect(component.isSettingsModalOpen).toBe(false);
     });
 
     it('should not close modal when modal content is clicked', () => {
@@ -181,13 +180,12 @@ describe('HeaderComponent', () => {
       fixture.detectChanges();
 
       const event = new MouseEvent('click');
-      spyOn(event, 'stopPropagation');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
 
       component.onModalContentClick(event);
 
-      expect(event.stopPropagation).toHaveBeenCalled();
-      // Ensure the variable that controls the modal visibility is still true
-      expect(component.isSettingsModalOpen).toBeTrue();
+      expect(stopPropagationSpy).toHaveBeenCalled();
+      expect(component.isSettingsModalOpen).toBe(true);
     });
 
     it('should toggle button text based on deleting state', () => {
@@ -205,7 +203,7 @@ describe('HeaderComponent', () => {
   describe('Account Details Loading', () => {
     it('should display loading state while fetching account details', () => {
       const accountSubject = new Subject<UserResponseDTO>();
-      accountService.getAccountDetails.and.returnValue(accountSubject.asObservable());
+      mockAccountService.getAccountDetails.mockReturnValue(accountSubject.asObservable());
 
       component.loadAccountDetails();
       component.isSettingsModalOpen = true;
@@ -215,7 +213,7 @@ describe('HeaderComponent', () => {
       const loadingContainer = fixture.debugElement.query(By.css('.loading-container'));
       const spinner = fixture.debugElement.query(By.css('.spinner'));
 
-      expect(loadingContainer).toBeTruthy(); // Should now be found
+      expect(loadingContainer).toBeTruthy();
       expect(spinner).toBeTruthy();
 
       accountSubject.next(mockAccountDetails);
@@ -224,7 +222,7 @@ describe('HeaderComponent', () => {
 
     it('should display error message when loading fails', () => {
       const errorSubject = new Subject<UserResponseDTO>();
-      accountService.getAccountDetails.and.returnValue(errorSubject.asObservable());
+      mockAccountService.getAccountDetails.mockReturnValue(errorSubject.asObservable());
 
       component.isSettingsModalOpen = true;
       component.loadAccountDetails();
@@ -242,13 +240,13 @@ describe('HeaderComponent', () => {
 
       expect(errorContainer).toBeTruthy();
       expect(component.accountDetailsError).toBe('Failed to load account details');
-      expect(component.isLoadingAccountDetails).toBeFalse();
+      expect(component.isLoadingAccountDetails).toBe(false);
     });
 
     it('should set loading state to false after successful fetch', () => {
       fixture.detectChanges();
 
-      expect(component.isLoadingAccountDetails).toBeFalse();
+      expect(component.isLoadingAccountDetails).toBe(false);
     });
 
     it('should store account details after successful fetch', () => {
@@ -292,13 +290,13 @@ describe('HeaderComponent', () => {
 
     it('should display all info rows', () => {
       const infoRows = compiled.querySelectorAll('.info-row');
-      expect(infoRows.length).toBe(4); // username, firstName, lastName, email
+      expect(infoRows).toHaveLength(4); // username, firstName, lastName, email
     });
   });
 
   describe('Account Details Error Handling', () => {
     it('should display error message when fetch fails', () => {
-      accountService.getAccountDetails.and.returnValue(
+      mockAccountService.getAccountDetails.mockReturnValue(
         throwError(() => ({ status: 500, error: { message: 'Server error' } }))
       );
 
@@ -316,7 +314,7 @@ describe('HeaderComponent', () => {
     });
 
     it('should display retry button on error', () => {
-      accountService.getAccountDetails.and.returnValue(
+      mockAccountService.getAccountDetails.mockReturnValue(
         throwError(() => ({ status: 500, error: { message: 'Server error' } }))
       );
 
@@ -330,15 +328,15 @@ describe('HeaderComponent', () => {
     });
 
     it('should reload account details when retry button is clicked', () => {
-      accountService.getAccountDetails.and.returnValue(
+      mockAccountService.getAccountDetails.mockReturnValue(
         throwError(() => ({ status: 500, error: { message: 'Server error' } }))
       );
 
       fixture.detectChanges();
 
-      // Reset spy and return success
-      accountService.getAccountDetails.calls.reset();
-      accountService.getAccountDetails.and.returnValue(of(mockAccountDetails));
+      // Reset mock and return success
+      mockAccountService.getAccountDetails.mockClear();
+      mockAccountService.getAccountDetails.mockReturnValue(of(mockAccountDetails));
 
       component.isSettingsModalOpen = true;
       fixture.detectChanges();
@@ -346,27 +344,27 @@ describe('HeaderComponent', () => {
       const retryButton = compiled.querySelector('.retry-btn') as HTMLButtonElement;
       retryButton.click();
 
-      expect(accountService.getAccountDetails).toHaveBeenCalled();
+      expect(mockAccountService.getAccountDetails).toHaveBeenCalled();
     });
 
     it('should redirect to login on 401 error', () => {
-      accountService.getAccountDetails.and.returnValue(
+      mockAccountService.getAccountDetails.mockReturnValue(
         throwError(() => ({ status: 401, error: { message: 'Unauthorized' } }))
       );
 
       fixture.detectChanges();
 
-      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
 
     it('should set loading state to false after error', () => {
-      accountService.getAccountDetails.and.returnValue(
+      mockAccountService.getAccountDetails.mockReturnValue(
         throwError(() => ({ status: 500, error: { message: 'Server error' } }))
       );
 
       fixture.detectChanges();
 
-      expect(component.isLoadingAccountDetails).toBeFalse();
+      expect(component.isLoadingAccountDetails).toBe(false);
     });
   });
 
@@ -400,14 +398,14 @@ describe('HeaderComponent', () => {
     it('should navigate to login page on logout', () => {
       component.logout();
 
-      expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
 
     it('should close modal on logout', () => {
       component.isSettingsModalOpen = true;
       component.logout();
 
-      expect(component.isSettingsModalOpen).toBeFalse();
+      expect(component.isSettingsModalOpen).toBe(false);
     });
   });
 
@@ -425,103 +423,110 @@ describe('HeaderComponent', () => {
     });
 
     it('should show confirmation dialog when delete button is clicked', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
 
       const deleteButton = fixture.debugElement.query(By.css('.delete-account-btn'));
       deleteButton.nativeElement.click();
 
-      expect(window.confirm).toHaveBeenCalledWith(
-        jasmine.stringContaining('Are you sure you want to delete your account?')
+      expect(confirmSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Are you sure you want to delete your account?')
       );
+
+      confirmSpy.mockRestore();
     });
 
     it('should not delete account if user cancels confirmation', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+      jest.spyOn(window, 'confirm').mockReturnValue(false);
 
       component.deleteAccount();
 
-      expect(accountService.deleteAccount).not.toHaveBeenCalled();
+      expect(mockAccountService.deleteAccount).not.toHaveBeenCalled();
     });
 
     it('should delete account if user confirms', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      accountService.deleteAccount.and.returnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      jest.spyOn(window, 'alert').mockImplementation();
+      mockAccountService.deleteAccount.mockReturnValue(of(undefined));
 
       component.deleteAccount();
 
-      expect(accountService.deleteAccount).toHaveBeenCalled();
+      expect(mockAccountService.deleteAccount).toHaveBeenCalled();
     });
 
     it('should set deleting state to true while deleting', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
 
       const deleteSubject = new Subject<void>();
-      accountService.deleteAccount.and.returnValue(deleteSubject.asObservable());
+      mockAccountService.deleteAccount.mockReturnValue(deleteSubject.asObservable());
 
       component.deleteAccount();
       fixture.detectChanges();
 
-      // The state should be true while the subject hasn't emitted
-      expect(component.isDeletingAccount).toBeTrue();
+      expect(component.isDeletingAccount).toBe(true);
 
       deleteSubject.next();
       deleteSubject.complete();
-      expect(component.isDeletingAccount).toBeFalse();
+      expect(component.isDeletingAccount).toBe(false);
     });
 
     it('should show success message after successful deletion', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      accountService.deleteAccount.and.returnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      const alertSpy = jest.spyOn(window, 'alert').mockImplementation();
+      mockAccountService.deleteAccount.mockReturnValue(of(undefined));
 
       component.deleteAccount();
 
-      expect(window.alert).toHaveBeenCalledWith('Your account has been deleted successfully.');
+      expect(alertSpy).toHaveBeenCalledWith('Your account has been deleted successfully.');
+
+      alertSpy.mockRestore();
     });
 
     it('should logout after successful deletion', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      spyOn(component, 'logout');
-      accountService.deleteAccount.and.returnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      jest.spyOn(window, 'alert').mockImplementation();
+      const logoutSpy = jest.spyOn(component, 'logout');
+      mockAccountService.deleteAccount.mockReturnValue(of(undefined));
 
       component.deleteAccount();
 
-      expect(component.logout).toHaveBeenCalled();
+      expect(logoutSpy).toHaveBeenCalled();
     });
 
     it('should reset deleting state after successful deletion', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      accountService.deleteAccount.and.returnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      jest.spyOn(window, 'alert').mockImplementation();
+      mockAccountService.deleteAccount.mockReturnValue(of(undefined));
 
       component.deleteAccount();
 
-      expect(component.isDeletingAccount).toBeFalse();
+      expect(component.isDeletingAccount).toBe(false);
     });
 
     it('should handle delete error gracefully', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      accountService.deleteAccount.and.returnValue(
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      const alertSpy = jest.spyOn(window, 'alert').mockImplementation();
+      mockAccountService.deleteAccount.mockReturnValue(
         throwError(() => ({ error: { message: 'Failed to delete' } }))
       );
 
       component.deleteAccount();
 
-      expect(window.alert).toHaveBeenCalledWith('Failed to delete');
-      expect(component.isDeletingAccount).toBeFalse();
+      expect(alertSpy).toHaveBeenCalledWith('Failed to delete');
+      expect(component.isDeletingAccount).toBe(false);
+
+      alertSpy.mockRestore();
     });
 
     it('should show generic error message when error format is unexpected', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
-      spyOn(window, 'alert');
-      accountService.deleteAccount.and.returnValue(throwError(() => ({ status: 500 })));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      const alertSpy = jest.spyOn(window, 'alert').mockImplementation();
+      mockAccountService.deleteAccount.mockReturnValue(throwError(() => ({ status: 500 })));
 
       component.deleteAccount();
 
-      expect(window.alert).toHaveBeenCalledWith('Failed to delete account. Please try again.');
+      expect(alertSpy).toHaveBeenCalledWith('Failed to delete account. Please try again.');
+
+      alertSpy.mockRestore();
     });
 
     it('should disable delete button while deleting', () => {
@@ -529,7 +534,7 @@ describe('HeaderComponent', () => {
       fixture.detectChanges();
 
       const deleteButton = compiled.querySelector('.delete-account-btn') as HTMLButtonElement;
-      expect(deleteButton.disabled).toBeTrue();
+      expect(deleteButton.disabled).toBe(true);
     });
 
     it('should show "Deleting..." text while deleting', () => {

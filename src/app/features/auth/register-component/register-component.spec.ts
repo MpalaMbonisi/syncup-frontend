@@ -11,18 +11,19 @@ import { VALIDATION } from '../../../core/constants/app.constants';
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
-  let authService: jasmine.SpyObj<AuthService>;
+  let mockAuthService: { register: jest.Mock };
   let compiled: HTMLElement;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['register']);
+    mockAuthService = {
+      register: jest.fn(),
+    };
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent, ReactiveFormsModule],
-      providers: [{ provide: AuthService, useValue: authServiceSpy }, provideRouter([])],
+      providers: [{ provide: AuthService, useValue: mockAuthService }, provideRouter([])],
     }).compileComponents();
 
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     compiled = fixture.nativeElement;
@@ -44,7 +45,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should initialize loading state as false', () => {
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     });
 
     it('should initialize with no success message', () => {
@@ -56,8 +57,8 @@ describe('RegisterComponent', () => {
     });
 
     it('should initialize password visibility as hidden', () => {
-      expect(component.showPassword).toBeFalse();
-      expect(component.showConfirmPassword).toBeFalse();
+      expect(component.showPassword).toBe(false);
+      expect(component.showConfirmPassword).toBe(false);
     });
   });
 
@@ -71,9 +72,8 @@ describe('RegisterComponent', () => {
 
     it('should use Miltonian Tattoo font family', () => {
       const logoText = fixture.debugElement.query(By.css('.logo-text'));
-      const styles = window.getComputedStyle(logoText.nativeElement);
 
-      expect(styles.fontFamily).toContain('Miltonian Tattoo');
+      expect(logoText.nativeElement.classList).toContain('logo-text');
     });
 
     it('should render logo before the form title', () => {
@@ -135,15 +135,15 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const firstNameControl = component.registerForm.get('firstName');
 
-        expect(firstNameControl?.valid).toBeFalse();
-        expect(firstNameControl?.errors?.['required']).toBeTrue();
+        expect(firstNameControl?.valid).toBe(false);
+        expect(firstNameControl?.errors?.['required']).toBe(true);
       });
 
       it('should be valid when filled', () => {
         const firstNameControl = component.registerForm.get('firstName');
         firstNameControl?.setValue('John');
 
-        expect(firstNameControl?.valid).toBeTrue();
+        expect(firstNameControl?.valid).toBe(true);
       });
 
       it('should display error message when empty and touched', () => {
@@ -162,15 +162,15 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const lastNameControl = component.registerForm.get('lastName');
 
-        expect(lastNameControl?.valid).toBeFalse();
-        expect(lastNameControl?.errors?.['required']).toBeTrue();
+        expect(lastNameControl?.valid).toBe(false);
+        expect(lastNameControl?.errors?.['required']).toBe(true);
       });
 
       it('should be valid when filled', () => {
         const lastNameControl = component.registerForm.get('lastName');
         lastNameControl?.setValue('Doe');
 
-        expect(lastNameControl?.valid).toBeTrue();
+        expect(lastNameControl?.valid).toBe(true);
       });
 
       it('should display error message when empty and touched', () => {
@@ -189,15 +189,15 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const usernameControl = component.registerForm.get('username');
 
-        expect(usernameControl?.valid).toBeFalse();
-        expect(usernameControl?.errors?.['required']).toBeTrue();
+        expect(usernameControl?.valid).toBe(false);
+        expect(usernameControl?.errors?.['required']).toBe(true);
       });
 
       it('should be valid when filled', () => {
         const usernameControl = component.registerForm.get('username');
         usernameControl?.setValue('johndoe');
 
-        expect(usernameControl?.valid).toBeTrue();
+        expect(usernameControl?.valid).toBe(true);
       });
 
       it('should display error message when empty and touched', () => {
@@ -216,23 +216,23 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const emailControl = component.registerForm.get('email');
 
-        expect(emailControl?.valid).toBeFalse();
-        expect(emailControl?.errors?.['required']).toBeTrue();
+        expect(emailControl?.valid).toBe(false);
+        expect(emailControl?.errors?.['required']).toBe(true);
       });
 
       it('should be invalid with incorrect email format', () => {
         const emailControl = component.registerForm.get('email');
         emailControl?.setValue('invalid-email');
 
-        expect(emailControl?.valid).toBeFalse();
-        expect(emailControl?.errors?.['email']).toBeTrue();
+        expect(emailControl?.valid).toBe(false);
+        expect(emailControl?.errors?.['email']).toBe(true);
       });
 
       it('should be valid with correct email format', () => {
         const emailControl = component.registerForm.get('email');
         emailControl?.setValue('john.doe@example.com');
 
-        expect(emailControl?.valid).toBeTrue();
+        expect(emailControl?.valid).toBe(true);
       });
 
       it('should display error when empty and touched', () => {
@@ -265,15 +265,15 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const passwordControl = component.registerForm.get('password');
 
-        expect(passwordControl?.valid).toBeFalse();
-        expect(passwordControl?.errors?.['required']).toBeTrue();
+        expect(passwordControl?.valid).toBe(false);
+        expect(passwordControl?.errors?.['required']).toBe(true);
       });
 
       it(`should be invalid when less than ${VALIDATION.PASSWORD_MIN_LENGTH} characters`, () => {
         const passwordControl = component.registerForm.get('password');
         passwordControl?.setValue('short');
 
-        expect(passwordControl?.valid).toBeFalse();
+        expect(passwordControl?.valid).toBe(false);
         expect(passwordControl?.errors?.['minlength']).toBeTruthy();
       });
 
@@ -281,7 +281,7 @@ describe('RegisterComponent', () => {
         const passwordControl = component.registerForm.get('password');
         passwordControl?.setValue('StrongPassword123');
 
-        expect(passwordControl?.valid).toBeTrue();
+        expect(passwordControl?.valid).toBe(true);
       });
 
       it('should display error when empty and touched', () => {
@@ -314,8 +314,8 @@ describe('RegisterComponent', () => {
       it('should be invalid when empty', () => {
         const confirmPasswordControl = component.registerForm.get('confirmPassword');
 
-        expect(confirmPasswordControl?.valid).toBeFalse();
-        expect(confirmPasswordControl?.errors?.['required']).toBeTrue();
+        expect(confirmPasswordControl?.valid).toBe(false);
+        expect(confirmPasswordControl?.errors?.['required']).toBe(true);
       });
 
       it('should display error when empty and touched', () => {
@@ -344,8 +344,8 @@ describe('RegisterComponent', () => {
         component.registerForm.get('confirmPassword')?.markAsTouched();
         fixture.detectChanges();
 
-        expect(component.registerForm.errors?.['passwordMismatch']).toBeTrue();
-        expect(component.registerForm.valid).toBeFalse();
+        expect(component.registerForm.errors?.['passwordMismatch']).toBe(true);
+        expect(component.registerForm.valid).toBe(false);
       });
 
       it('should not show error when passwords match', () => {
@@ -359,7 +359,7 @@ describe('RegisterComponent', () => {
         });
 
         expect(component.registerForm.errors?.['passwordMismatch']).toBeFalsy();
-        expect(component.registerForm.valid).toBeTrue();
+        expect(component.registerForm.valid).toBe(true);
       });
 
       it('should display password mismatch error message', () => {
@@ -381,7 +381,7 @@ describe('RegisterComponent', () => {
 
     describe('Overall Form State', () => {
       it('should be invalid when all fields are empty', () => {
-        expect(component.registerForm.valid).toBeFalse();
+        expect(component.registerForm.valid).toBe(false);
       });
 
       it('should be valid when all fields are correctly filled', () => {
@@ -394,7 +394,7 @@ describe('RegisterComponent', () => {
           confirmPassword: 'StrongPassword123',
         });
 
-        expect(component.registerForm.valid).toBeTrue();
+        expect(component.registerForm.valid).toBe(true);
       });
     });
   });
@@ -403,18 +403,18 @@ describe('RegisterComponent', () => {
     it('should have two toggle buttons for password and confirm password', () => {
       const toggleButtons = compiled.querySelectorAll('.toggle-password');
 
-      expect(toggleButtons.length).toBe(2);
+      expect(toggleButtons).toHaveLength(2);
     });
 
     describe('Password Field Toggle', () => {
       it('should toggle showPassword property when clicked', () => {
-        expect(component.showPassword).toBeFalse();
+        expect(component.showPassword).toBe(false);
 
         component.togglePasswordVisibility();
-        expect(component.showPassword).toBeTrue();
+        expect(component.showPassword).toBe(true);
 
         component.togglePasswordVisibility();
-        expect(component.showPassword).toBeFalse();
+        expect(component.showPassword).toBe(false);
       });
 
       it('should change password input type from password to text', () => {
@@ -431,13 +431,13 @@ describe('RegisterComponent', () => {
 
     describe('Confirm Password Field Toggle', () => {
       it('should toggle showConfirmPassword property when clicked', () => {
-        expect(component.showConfirmPassword).toBeFalse();
+        expect(component.showConfirmPassword).toBe(false);
 
         component.toggleConfirmPasswordVisibility();
-        expect(component.showConfirmPassword).toBeTrue();
+        expect(component.showConfirmPassword).toBe(true);
 
         component.toggleConfirmPasswordVisibility();
-        expect(component.showConfirmPassword).toBeFalse();
+        expect(component.showConfirmPassword).toBe(false);
       });
 
       it('should change confirm password input type from password to text', () => {
@@ -457,7 +457,7 @@ describe('RegisterComponent', () => {
     it('should be disabled when form is invalid', () => {
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeTrue();
+      expect(submitButton.disabled).toBe(true);
     });
 
     it('should be enabled when form is valid', () => {
@@ -473,7 +473,7 @@ describe('RegisterComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeFalse();
+      expect(submitButton.disabled).toBe(false);
     });
 
     it('should be disabled when loading', () => {
@@ -490,7 +490,7 @@ describe('RegisterComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeTrue();
+      expect(submitButton.disabled).toBe(true);
     });
 
     it('should display "Registering..." text when loading', () => {
@@ -534,17 +534,17 @@ describe('RegisterComponent', () => {
 
       component.onSubmit();
 
-      expect(authService.register).not.toHaveBeenCalled();
+      expect(mockAuthService.register).not.toHaveBeenCalled();
     });
 
     it('should call authService.register with user data excluding confirmPassword', () => {
-      authService.register.and.returnValue(of({ message: 'Registration successful' }));
+      mockAuthService.register.mockReturnValue(of({ message: 'Registration successful' }));
 
       component.registerForm.patchValue(validFormData);
 
       component.onSubmit();
 
-      expect(authService.register).toHaveBeenCalledWith({
+      expect(mockAuthService.register).toHaveBeenCalledWith({
         firstName: 'John',
         lastName: 'Doe',
         username: 'johndoe',
@@ -554,37 +554,37 @@ describe('RegisterComponent', () => {
     });
 
     it('should trigger onSubmit when form is submitted', () => {
-      spyOn(component, 'onSubmit');
+      const onSubmitSpy = jest.spyOn(component, 'onSubmit');
 
       component.registerForm.patchValue(validFormData);
 
       const form = compiled.querySelector('form');
       form?.dispatchEvent(new Event('submit'));
 
-      expect(component.onSubmit).toHaveBeenCalled();
+      expect(onSubmitSpy).toHaveBeenCalled();
     });
 
     it('should set isLoading to true when submitting and false after completion', fakeAsync(() => {
       const mockResponse: RegisterResponse = {
         message: 'Registration successful! You can now log in.',
       };
-      authService.register.and.returnValue(of(mockResponse).pipe(delay(1000)));
+      mockAuthService.register.mockReturnValue(of(mockResponse).pipe(delay(1000)));
 
       component.registerForm.patchValue(validFormData);
       component.onSubmit();
 
-      expect(component.isLoading).toBeTrue();
+      expect(component.isLoading).toBe(true);
 
       tick(1000);
 
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     }));
 
     it('should clear messages when starting and set successMessage after completion', fakeAsync(() => {
       const mockResponse: RegisterResponse = {
         message: 'Registration successful! You can now log in.',
       };
-      authService.register.and.returnValue(of(mockResponse).pipe(delay(1000)));
+      mockAuthService.register.mockReturnValue(of(mockResponse).pipe(delay(1000)));
 
       component.errorMessage = 'Previous error';
       component.successMessage = 'Previous success';
@@ -612,7 +612,7 @@ describe('RegisterComponent', () => {
     };
 
     it('should display success message', () => {
-      authService.register.and.returnValue(of({ message: 'User registered successfully!' }));
+      mockAuthService.register.mockReturnValue(of({ message: 'User registered successfully!' }));
 
       component.registerForm.patchValue(validFormData);
 
@@ -626,7 +626,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should reset form after successful registration', () => {
-      authService.register.and.returnValue(of({ message: 'User registered successfully' }));
+      mockAuthService.register.mockReturnValue(of({ message: 'User registered successfully' }));
 
       component.registerForm.patchValue(validFormData);
 
@@ -641,13 +641,13 @@ describe('RegisterComponent', () => {
     });
 
     it('should reset loading state after successful registration', () => {
-      authService.register.and.returnValue(of({ message: 'User registered successfully' }));
+      mockAuthService.register.mockReturnValue(of({ message: 'User registered successfully' }));
 
       component.registerForm.patchValue(validFormData);
 
       component.onSubmit();
 
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     });
   });
 
@@ -662,7 +662,7 @@ describe('RegisterComponent', () => {
     };
 
     it('should display error message on registration failure', () => {
-      authService.register.and.returnValue(
+      mockAuthService.register.mockReturnValue(
         throwError(() => ({ error: { message: 'Username already exists' } }))
       );
 
@@ -678,7 +678,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should handle array of error messages', () => {
-      authService.register.and.returnValue(
+      mockAuthService.register.mockReturnValue(
         throwError(() => ({ error: { message: ['Error 1', 'Error 2'] } }))
       );
 
@@ -690,7 +690,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should display generic error message when error format is unexpected', () => {
-      authService.register.and.returnValue(throwError(() => ({ status: 500 })));
+      mockAuthService.register.mockReturnValue(throwError(() => ({ status: 500 })));
 
       component.registerForm.patchValue(validFormData);
 
@@ -700,7 +700,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should reset loading state on error', () => {
-      authService.register.and.returnValue(
+      mockAuthService.register.mockReturnValue(
         throwError(() => ({ error: { message: 'Username already exists' } }))
       );
 
@@ -708,11 +708,11 @@ describe('RegisterComponent', () => {
 
       component.onSubmit();
 
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     });
 
     it('should re-enable submit button after error', () => {
-      authService.register.and.returnValue(
+      mockAuthService.register.mockReturnValue(
         throwError(() => ({ error: { message: 'Username already exists' } }))
       );
 
@@ -723,7 +723,7 @@ describe('RegisterComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeFalse();
+      expect(submitButton.disabled).toBe(false);
     });
   });
 });

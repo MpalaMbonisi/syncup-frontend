@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideRouter, Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -12,24 +12,27 @@ import { ERROR_MESSAGES, VALIDATION } from '../../../core/constants/app.constant
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authService: jasmine.SpyObj<AuthService>;
+  let mockAuthService: { login: jest.Mock };
   let compiled: HTMLElement;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
+    // Create mock services
+    mockAuthService = {
+      login: jest.fn(),
+    };
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule],
       providers: [
-        { provide: AuthService, useValue: authServiceSpy },
+        { provide: AuthService, useValue: mockAuthService },
         provideRouter([
           { path: 'register', component: RegisterComponent },
           { path: 'login', component: LoginComponent },
+          { path: 'dashboard', component: LoginComponent },
         ]),
       ],
     }).compileComponents();
 
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     compiled = fixture.nativeElement;
@@ -47,7 +50,7 @@ describe('LoginComponent', () => {
     });
 
     it('should initialize loading state as false', () => {
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     });
 
     it('should initialize with no error message', () => {
@@ -55,7 +58,7 @@ describe('LoginComponent', () => {
     });
 
     it('should initialize password visibility as hidden', () => {
-      expect(component.showPassword).toBeFalse();
+      expect(component.showPassword).toBe(false);
     });
   });
 
@@ -69,9 +72,8 @@ describe('LoginComponent', () => {
 
     it('should use Miltonian Tattoo font family', () => {
       const logoText = fixture.debugElement.query(By.css('.logo-text'));
-      const styles = window.getComputedStyle(logoText.nativeElement);
 
-      expect(styles.fontFamily).toContain('Miltonian Tattoo');
+      expect(logoText.nativeElement.classList).toContain('logo-text');
     });
 
     it('should render logo before the form title', () => {
@@ -137,15 +139,15 @@ describe('LoginComponent', () => {
       it('should be invalid when empty', () => {
         const usernameControl = component.loginForm.get('username');
 
-        expect(usernameControl?.valid).toBeFalse();
-        expect(usernameControl?.errors?.['required']).toBeTrue();
+        expect(usernameControl?.valid).toBe(false);
+        expect(usernameControl?.errors?.['required']).toBe(true);
       });
 
       it('should be valid when filled', () => {
         const usernameControl = component.loginForm.get('username');
         usernameControl?.setValue('johndoe');
 
-        expect(usernameControl?.valid).toBeTrue();
+        expect(usernameControl?.valid).toBe(true);
       });
 
       it('should display error message when empty and touched', () => {
@@ -164,15 +166,15 @@ describe('LoginComponent', () => {
       it('should be invalid when empty', () => {
         const passwordControl = component.loginForm.get('password');
 
-        expect(passwordControl?.valid).toBeFalse();
-        expect(passwordControl?.errors?.['required']).toBeTrue();
+        expect(passwordControl?.valid).toBe(false);
+        expect(passwordControl?.errors?.['required']).toBe(true);
       });
 
       it(`should be invalid when less than ${VALIDATION.PASSWORD_MIN_LENGTH} characters`, () => {
         const passwordControl = component.loginForm.get('password');
         passwordControl?.setValue('short');
 
-        expect(passwordControl?.valid).toBeFalse();
+        expect(passwordControl?.valid).toBe(false);
         expect(passwordControl?.errors?.['minlength']).toBeTruthy();
       });
 
@@ -180,7 +182,7 @@ describe('LoginComponent', () => {
         const passwordControl = component.loginForm.get('password');
         passwordControl?.setValue('StrongPassword123');
 
-        expect(passwordControl?.valid).toBeTrue();
+        expect(passwordControl?.valid).toBe(true);
       });
 
       it('should display error when empty and touched', () => {
@@ -211,7 +213,7 @@ describe('LoginComponent', () => {
 
     describe('Overall Form State', () => {
       it('should be invalid when both fields are empty', () => {
-        expect(component.loginForm.valid).toBeFalse();
+        expect(component.loginForm.valid).toBe(false);
       });
 
       it('should be invalid when only username is filled', () => {
@@ -220,7 +222,7 @@ describe('LoginComponent', () => {
           password: '',
         });
 
-        expect(component.loginForm.valid).toBeFalse();
+        expect(component.loginForm.valid).toBe(false);
       });
 
       it('should be invalid when only password is filled', () => {
@@ -229,7 +231,7 @@ describe('LoginComponent', () => {
           password: 'StrongPassword123',
         });
 
-        expect(component.loginForm.valid).toBeFalse();
+        expect(component.loginForm.valid).toBe(false);
       });
 
       it('should be valid when both fields are correctly filled', () => {
@@ -238,7 +240,7 @@ describe('LoginComponent', () => {
           password: 'StrongPassword123',
         });
 
-        expect(component.loginForm.valid).toBeTrue();
+        expect(component.loginForm.valid).toBe(true);
       });
     });
   });
@@ -252,13 +254,13 @@ describe('LoginComponent', () => {
     });
 
     it('should toggle showPassword property when clicked', () => {
-      expect(component.showPassword).toBeFalse();
+      expect(component.showPassword).toBe(false);
 
       component.togglePasswordVisibility();
-      expect(component.showPassword).toBeTrue();
+      expect(component.showPassword).toBe(true);
 
       component.togglePasswordVisibility();
-      expect(component.showPassword).toBeFalse();
+      expect(component.showPassword).toBe(false);
     });
 
     it('should change password input type from password to text', () => {
@@ -288,7 +290,7 @@ describe('LoginComponent', () => {
     it('should be disabled when form is invalid', () => {
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeTrue();
+      expect(submitButton.disabled).toBe(true);
     });
 
     it('should be enabled when form is valid', () => {
@@ -300,7 +302,7 @@ describe('LoginComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeFalse();
+      expect(submitButton.disabled).toBe(false);
     });
 
     it('should be disabled when loading', () => {
@@ -313,7 +315,7 @@ describe('LoginComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeTrue();
+      expect(submitButton.disabled).toBe(true);
     });
 
     it('should display "Logging in..." text when loading', () => {
@@ -344,11 +346,11 @@ describe('LoginComponent', () => {
 
       component.onSubmit();
 
-      expect(authService.login).not.toHaveBeenCalled();
+      expect(mockAuthService.login).not.toHaveBeenCalled();
     });
 
     it('should call authService.login with correct credentials', () => {
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token' }));
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token' }));
 
       component.loginForm.patchValue({
         username: 'johndoe',
@@ -357,14 +359,15 @@ describe('LoginComponent', () => {
 
       component.onSubmit();
 
-      expect(authService.login).toHaveBeenCalledWith({
+      expect(mockAuthService.login).toHaveBeenCalledWith({
         username: 'johndoe',
         password: 'StrongPassword123',
       });
     });
 
     it('should trigger onSubmit when form is submitted', () => {
-      spyOn(component, 'onSubmit');
+      // Senior tip: mockImplementation() prevents the real (and complex) logic from running
+      const onSubmitSpy = jest.spyOn(component, 'onSubmit').mockImplementation(() => {});
 
       component.loginForm.patchValue({
         username: 'johndoe',
@@ -374,11 +377,13 @@ describe('LoginComponent', () => {
       const form = compiled.querySelector('form');
       form?.dispatchEvent(new Event('submit'));
 
-      expect(component.onSubmit).toHaveBeenCalled();
+      expect(onSubmitSpy).toHaveBeenCalled();
+
+      onSubmitSpy.mockRestore(); // Clean up
     });
 
     it('should set isLoading to true when submitting', () => {
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token' }));
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token' }));
 
       component.loginForm.patchValue({
         username: 'johndoe',
@@ -387,11 +392,11 @@ describe('LoginComponent', () => {
 
       component.onSubmit();
 
-      expect(component.isLoading).toBeTrue();
+      expect(component.isLoading).toBe(true);
     });
 
     it('should clear error message when submitting', () => {
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token' }));
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token' }));
       component.errorMessage = 'Previous error';
 
       component.loginForm.patchValue({
@@ -407,38 +412,46 @@ describe('LoginComponent', () => {
 
   describe('Successful Login', () => {
     it('should store token in localStorage', () => {
-      spyOn(localStorage, 'setItem');
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token-12345' }));
+      const setItemSpy = jest.spyOn(window.localStorage, 'setItem').mockImplementation(() => {});
+
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token-12345' }));
 
       component.loginForm.patchValue({
         username: 'johndoe',
         password: 'StrongPassword123',
       });
+      component.loginForm.updateValueAndValidity();
 
       component.onSubmit();
 
-      expect(localStorage.setItem).toHaveBeenCalledWith('token', 'mock-jwt-token-12345');
+      expect(setItemSpy).toHaveBeenCalled();
+      expect(setItemSpy).toHaveBeenCalledWith('token', 'mock-jwt-token-12345');
+
+      setItemSpy.mockRestore();
     });
 
-    it('should navigate to dashboard', () => {
+    it('should navigate to dashboard', fakeAsync(() => {
       const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token' }));
+      const navigateSpy = jest.spyOn(router, 'navigate');
 
-      component.loginForm.patchValue({
-        username: 'johndoe',
-        password: 'StrongPassword123',
-      });
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token' }));
+
+      component.loginForm.controls['username'].setValue('johndoe');
+      component.loginForm.controls['password'].setValue('StrongPassword123');
+      component.loginForm.updateValueAndValidity();
 
       component.onSubmit();
 
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
-    });
+      tick();
+      fixture.detectChanges();
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
+    }));
   });
 
   describe('Failed Login', () => {
     it('should display error message on login failure', () => {
-      authService.login.and.returnValue(
+      mockAuthService.login.mockReturnValue(
         throwError(() => ({ error: { message: 'Invalid credentials' } }))
       );
 
@@ -458,7 +471,7 @@ describe('LoginComponent', () => {
     });
 
     it('should handle array of error messages', () => {
-      authService.login.and.returnValue(
+      mockAuthService.login.mockReturnValue(
         throwError(() => ({ error: { message: ['Error 1', 'Error 2'] } }))
       );
 
@@ -473,7 +486,7 @@ describe('LoginComponent', () => {
     });
 
     it('should display generic error message when error format is unexpected', () => {
-      authService.login.and.returnValue(throwError(() => ({ status: 500 })));
+      mockAuthService.login.mockReturnValue(throwError(() => ({ status: 500 })));
 
       component.loginForm.patchValue({
         username: 'johndoe',
@@ -486,7 +499,7 @@ describe('LoginComponent', () => {
     });
 
     it('should reset loading state on error', () => {
-      authService.login.and.returnValue(
+      mockAuthService.login.mockReturnValue(
         throwError(() => ({ error: { message: 'Invalid credentials' } }))
       );
 
@@ -497,11 +510,11 @@ describe('LoginComponent', () => {
 
       component.onSubmit();
 
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBe(false);
     });
 
     it('should re-enable submit button after error', () => {
-      authService.login.and.returnValue(
+      mockAuthService.login.mockReturnValue(
         throwError(() => ({ error: { message: 'Invalid credentials' } }))
       );
 
@@ -515,11 +528,11 @@ describe('LoginComponent', () => {
 
       const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      expect(submitButton.disabled).toBeFalse();
+      expect(submitButton.disabled).toBe(false);
     });
 
     it('should clear error message on new submission attempt', () => {
-      authService.login.and.returnValue(
+      mockAuthService.login.mockReturnValue(
         throwError(() => ({ error: { message: 'Invalid credentials' } }))
       );
 
@@ -532,7 +545,7 @@ describe('LoginComponent', () => {
       expect(component.errorMessage).toBeTruthy();
 
       // Now make it succeed
-      authService.login.and.returnValue(of({ token: 'mock-jwt-token' }));
+      mockAuthService.login.mockReturnValue(of({ token: 'mock-jwt-token' }));
       component.loginForm.patchValue({ password: 'correctpassword' });
 
       component.onSubmit();

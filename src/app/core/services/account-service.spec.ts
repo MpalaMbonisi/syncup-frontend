@@ -64,7 +64,7 @@ describe('AccountService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/account/details`);
 
-      expect(req.request.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeTrue();
+      expect(req.request.headers.has(HTTP_HEADERS.AUTHORISATION)).toBe(true);
       expect(req.request.headers.get(HTTP_HEADERS.AUTHORISATION)).toBe('Bearer test-token');
 
       req.flush({});
@@ -135,7 +135,7 @@ describe('AccountService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/account/delete`);
 
-      expect(req.request.headers.has(HTTP_HEADERS.AUTHORISATION)).toBeTrue();
+      expect(req.request.headers.has(HTTP_HEADERS.AUTHORISATION)).toBe(true);
       expect(req.request.headers.get(HTTP_HEADERS.AUTHORISATION)).toBe('Bearer test-token');
 
       req.flush(null, { status: 204, statusText: 'No Content' });

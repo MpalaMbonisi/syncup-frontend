@@ -10,24 +10,27 @@ import { authGuard } from './auth-guard';
 import { ROUTES, STORAGE_KEYS } from '../constants/app.constants';
 
 describe('authGuard', () => {
-  let router: jasmine.SpyObj<Router>;
+  let router: jest.Mocked<Router>;
 
   const executeGuard: CanActivateFn = (...guardParameters) =>
     TestBed.runInInjectionContext(() => authGuard(...guardParameters));
 
   beforeEach(() => {
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const routerSpy = {
+      navigate: jest.fn(),
+    };
 
     TestBed.configureTestingModule({
       providers: [{ provide: Router, useValue: routerSpy }],
     });
 
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    router = TestBed.inject(Router) as jest.Mocked<Router>;
     localStorage.clear();
   });
 
   afterEach(() => {
     localStorage.clear();
+    jest.clearAllMocks();
   });
 
   it('should be created', () => {
@@ -41,7 +44,7 @@ describe('authGuard', () => {
       return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
     });
 
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
@@ -50,7 +53,7 @@ describe('authGuard', () => {
       return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
     });
 
-    expect(result).toBeFalse();
+    expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
   });
 
@@ -61,7 +64,7 @@ describe('authGuard', () => {
       return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
     });
 
-    expect(result).toBeFalse();
+    expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
   });
 
@@ -72,7 +75,7 @@ describe('authGuard', () => {
       return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
     });
 
-    expect(result).toBeFalse();
+    expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
   });
 
@@ -83,7 +86,7 @@ describe('authGuard', () => {
       return authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
     });
 
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 });
