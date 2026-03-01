@@ -6,6 +6,7 @@ module.exports = {
     '<rootDir>/dist/'
   ],
   coverageDirectory: 'coverage',
+  coverageReporters: ['html', 'lcov', 'text-summary'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',

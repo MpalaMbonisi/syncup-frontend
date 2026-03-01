@@ -30,16 +30,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci 
 
-      - name: Setup Chrome for Testing
-        uses: browser-actions/setup-chrome@latest
-
       - name: Code Quality Check (ESLint)
         run: npm run lint
 
       - name: Format Check (Prettier)
         run: npm run format:check
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests (Jest)
         run: npm run test:ci
 
       - name: Build Production
@@ -49,7 +46,9 @@ jobs:
         uses: codecov/codecov-action@v3
         if: matrix.node-version == '20.x'
         with: 
-          file: ./coverage/lcov.info
+          # Using a glob pattern ensures it finds lcov.info inside the coverage folder
+          directory: ./coverage/
+          files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
 
