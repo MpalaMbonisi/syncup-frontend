@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaskListResponseDTO, TaskListService } from './task-list-service';
+import { TaskListResponseDTO, TaskListService, TaskListUpdateTitleDTO } from './task-list-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient } from '@angular/common/http';
@@ -291,6 +291,81 @@ describe('TaskListService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/list/create`);
       req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+  });
+
+  describe('updateListTitle', () => {
+    it('should update task list title', () => {
+      const listId = 1;
+      const titleData: TaskListUpdateTitleDTO = { title: 'Updated Title' };
+      const mockResponse: TaskListResponseDTO = {
+        id: 1,
+        title: 'Updated Title',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      service.updateListTitle(listId, titleData).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.title).toBe('Updated Title');
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/title/update`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(titleData);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 400 error when title is empty', () => {
+      const listId = 1;
+      const titleData: TaskListUpdateTitleDTO = { title: '' };
+      const mockError = { message: ['Title cannot be empty.'] };
+
+      service.updateListTitle(listId, titleData).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/title/update`);
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('should handle 404 error when list not found', () => {
+      const listId = 999;
+      const titleData: TaskListUpdateTitleDTO = { title: 'Updated Title' };
+      const mockError = { message: 'List not found' };
+
+      service.updateListTitle(listId, titleData).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/title/update`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle 409 error when duplicate title exists', () => {
+      const listId = 1;
+      const titleData: TaskListUpdateTitleDTO = { title: 'Existing Title' };
+      const mockError = { message: 'You already have a list with this title!' };
+
+      service.updateListTitle(listId, titleData).subscribe({
+        next: () => fail('should have failed with 409 error'),
+        error: error => {
+          expect(error.status).toBe(409);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/title/update`);
+      req.flush(mockError, { status: 409, statusText: 'Conflict' });
     });
   });
 });
