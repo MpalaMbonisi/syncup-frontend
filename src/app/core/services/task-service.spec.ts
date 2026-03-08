@@ -1,6 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaskCreateDTO, TaskService, TaskUpdateStatusDTO } from './task-service';
+import {
+  TaskCreateDTO,
+  TaskService,
+  TaskUpdateDescriptionDTO,
+  TaskUpdateStatusDTO,
+} from './task-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -125,6 +130,52 @@ describe('TaskService', () => {
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(statusData);
       req.flush(mockResponse);
+    });
+  });
+
+  describe('updateTaskDescription', () => {
+    it('should update task description', () => {
+      const listId = 1;
+      const taskId = 1;
+      const descriptionData: TaskUpdateDescriptionDTO = { description: 'Updated description' };
+      const mockResponse = {
+        id: 1,
+        description: 'Updated description',
+        completed: false,
+        taskListTitle: 'My List',
+      };
+
+      service.updateTaskDescription(listId, taskId, descriptionData).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.description).toBe('Updated description');
+      });
+
+      const req = httpMock.expectOne(
+        `${environment.apiUrl}/list/${listId}/task/${taskId}/description`
+      );
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(descriptionData);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 400 error when description is empty', () => {
+      const listId = 1;
+      const taskId = 1;
+      const descriptionData: TaskUpdateDescriptionDTO = { description: '' };
+      const mockError = { message: ['Description cannot be empty.'] };
+
+      service.updateTaskDescription(listId, taskId, descriptionData).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(
+        `${environment.apiUrl}/list/${listId}/task/${taskId}/description`
+      );
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
     });
   });
 });
