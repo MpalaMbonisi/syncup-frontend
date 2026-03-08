@@ -178,4 +178,36 @@ describe('TaskService', () => {
       req.flush(mockError, { status: 400, statusText: 'Bad Request' });
     });
   });
+
+  describe('deleteTask', () => {
+    it('should delete a task', () => {
+      const listId = 1;
+      const taskId = 1;
+
+      service.deleteTask(listId, taskId).subscribe(response => {
+        expect(response).toBeNull();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/${taskId}`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+
+    it('should handle 404 error when task not found', () => {
+      const listId = 1;
+      const taskId = 999;
+      const mockError = { message: 'Task not found' };
+
+      service.deleteTask(listId, taskId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/${taskId}`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+  });
 });
