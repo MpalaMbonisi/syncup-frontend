@@ -1,0 +1,68 @@
+import { TestBed } from '@angular/core/testing';
+
+import { TaskCreateDTO, TaskService } from './task-service';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+describe('TaskService', () => {
+  let service: TaskService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [TaskService, provideHttpClient(), provideHttpClientTesting()],
+    });
+    service = TestBed.inject(TaskService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('createTask', () => {
+    it('should create a new task', () => {
+      const listId = 1;
+      const taskData: TaskCreateDTO = { description: 'New task' };
+      const mockResponse = {
+        id: 1,
+        description: 'New task',
+        completed: false,
+        taskListTitle: 'My List',
+      };
+
+      service.createTask(listId, taskData).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.id).toBe(1);
+        expect(response.description).toBe('New task');
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/create`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(taskData);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 400 error when description is empty', () => {
+      const listId = 1;
+      const taskData: TaskCreateDTO = { description: '' };
+      const mockError = { message: ['Description cannot be empty.'] };
+
+      service.createTask(listId, taskData).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/create`);
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+  });
+});
