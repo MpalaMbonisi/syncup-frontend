@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaskCreateDTO, TaskService } from './task-service';
+import { TaskCreateDTO, TaskService, TaskUpdateStatusDTO } from './task-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -101,6 +101,30 @@ describe('TaskService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/${taskId}`);
       req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+  });
+
+  describe('updateTaskStatus', () => {
+    it('should update task status', () => {
+      const listId = 1;
+      const taskId = 1;
+      const statusData: TaskUpdateStatusDTO = { completed: true };
+      const mockResponse = {
+        id: 1,
+        description: 'Test task',
+        completed: true,
+        taskListTitle: 'My List',
+      };
+
+      service.updateTaskStatus(listId, taskId, statusData).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.completed).toBe(true);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/task/${taskId}/status`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(statusData);
+      req.flush(mockResponse);
     });
   });
 });
