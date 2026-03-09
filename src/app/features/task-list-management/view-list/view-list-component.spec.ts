@@ -138,4 +138,71 @@ describe('ViewListComponent', () => {
       expect(taskDescriptions[1].textContent).toContain('Buy bread');
     });
   });
+
+  describe('Task Creation', () => {
+    it('should have add task input', () => {
+      const input = fixture.nativeElement.querySelector('.add-task-input');
+      expect(input).toBeTruthy();
+    });
+
+    it('should create task when form is submitted', () => {
+      const newTask = {
+        id: 3,
+        description: 'Buy eggs',
+        completed: false,
+        taskListTitle: 'Shopping List',
+      };
+      mockTaskService.createTask.mockReturnValue(of(newTask));
+
+      component.newTaskDescription = 'Buy eggs';
+      component.addTask();
+
+      expect(mockTaskService.createTask).toHaveBeenCalledWith(1, { description: 'Buy eggs' });
+    });
+
+    it('should clear input after task creation', () => {
+      const newTask = {
+        id: 3,
+        description: 'Buy eggs',
+        completed: false,
+        taskListTitle: 'Shopping List',
+      };
+      mockTaskService.createTask.mockReturnValue(of(newTask));
+
+      component.newTaskDescription = 'Buy eggs';
+      component.addTask();
+
+      expect(component.newTaskDescription).toBe('');
+    });
+
+    it('should add new task to list', () => {
+      const newTask = {
+        id: 3,
+        description: 'Buy eggs',
+        completed: false,
+        taskListTitle: 'Shopping List',
+      };
+      mockTaskService.createTask.mockReturnValue(of(newTask));
+
+      const initialLength = component.list!.tasks!.length;
+      component.newTaskDescription = 'Buy eggs';
+      component.addTask();
+
+      expect(component.list!.tasks!.length).toBe(initialLength + 1);
+    });
+
+    it('should not create task with empty description', () => {
+      component.newTaskDescription = '';
+      component.addTask();
+
+      expect(mockTaskService.createTask).not.toHaveBeenCalled();
+    });
+
+    it('should not create task with whitespace-only description', () => {
+      component.newTaskDescription = '   ';
+      component.addTask();
+
+      expect(mockTaskService.createTask).not.toHaveBeenCalled();
+    });
+  });
 });
