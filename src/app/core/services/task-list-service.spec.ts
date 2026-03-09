@@ -368,4 +368,50 @@ describe('TaskListService', () => {
       req.flush(mockError, { status: 409, statusText: 'Conflict' });
     });
   });
+
+  describe('deleteList', () => {
+    it('should delete a task list', () => {
+      const listId = 1;
+
+      service.deleteList(listId).subscribe(response => {
+        expect(response).toBeNull();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+
+    it('should handle 404 error when list not found', () => {
+      const listId = 999;
+      const mockError = { message: 'List not found' };
+
+      service.deleteList(listId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle 403 error when user is not owner', () => {
+      const listId = 1;
+      const mockError = { message: 'You are not the owner of this list' };
+
+      service.deleteList(listId).subscribe({
+        next: () => fail('should have failed with 403 error'),
+        error: error => {
+          expect(error.status).toBe(403);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
+      req.flush(mockError, { status: 403, statusText: 'Forbidden' });
+    });
+  });
 });
