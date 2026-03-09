@@ -7,6 +7,7 @@ import { TaskService } from '../../../core/services/task-service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ROUTES } from '../../../core/constants/app.constants';
 
 describe('ViewListComponent', () => {
   let component: ViewListComponent;
@@ -328,6 +329,32 @@ describe('ViewListComponent', () => {
 
       expect(component.isEditingTitle).toBe(false);
       expect(component.list!.title).toBe('Shopping List');
+    });
+  });
+
+  describe('Delete List', () => {
+    it('should have delete list button', () => {
+      const deleteButton = fixture.nativeElement.querySelector('.delete-list-btn');
+      expect(deleteButton).toBeTruthy();
+    });
+
+    it('should show confirmation before deleting list', () => {
+      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+      component.deleteList();
+
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(mockTaskListService.deleteList).not.toHaveBeenCalled();
+    });
+
+    it('should delete list and navigate to dashboard', () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockTaskListService.deleteList.mockReturnValue(of(undefined));
+
+      component.deleteList();
+
+      expect(mockTaskListService.deleteList).toHaveBeenCalledWith(1);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
     });
   });
 });
