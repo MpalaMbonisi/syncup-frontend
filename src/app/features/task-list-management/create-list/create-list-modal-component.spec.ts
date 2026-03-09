@@ -93,4 +93,45 @@ describe('CreateListModalComponent', () => {
       expect(component.errorMessage).toBe('');
     });
   });
+
+  describe('Template Rendering', () => {
+    beforeEach(() => {
+      component.open();
+      fixture.detectChanges();
+    });
+
+    it('should display modal title', () => {
+      const modalTitle = compiled.querySelector('.modal-title');
+
+      expect(modalTitle).toBeTruthy();
+      expect(modalTitle!.textContent).toContain('Create New Task List');
+    });
+
+    it('should render title input field', () => {
+      const titleInput = compiled.querySelector('#listTitle');
+
+      expect(titleInput).toBeTruthy();
+      expect(titleInput?.getAttribute('type')).toBe('text');
+    });
+
+    it('should render close button', () => {
+      const closeButton = compiled.querySelector('.close-btn');
+
+      expect(closeButton).toBeTruthy();
+    });
+
+    it('should render cancel button', () => {
+      const cancelButton = compiled.querySelector('.cancel-btn');
+
+      expect(cancelButton).toBeTruthy();
+      expect(cancelButton!.textContent).toContain('Cancel');
+    });
+
+    it('should render create button', () => {
+      const createButton = compiled.querySelector('.create-btn');
+
+      expect(createButton).toBeTruthy();
+      expect(createButton!.textContent).toContain('Create');
+    });
+  });
 });
