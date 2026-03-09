@@ -22,6 +22,14 @@ export interface TaskListCreateDTO {
   title: string;
 }
 
+export interface TaskListUpdateTitleDTO {
+  title: string;
+}
+
+export interface TaskListDuplicateDTO {
+  newTitle?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -48,5 +56,27 @@ export class TaskListService {
    */
   createList(dto: TaskListCreateDTO): Observable<TaskListResponseDTO> {
     return this.http.post<TaskListResponseDTO>(`${this.apiUrl}/create`, dto);
+  }
+
+  /**
+   * Update task list title
+   */
+  updateListTitle(id: number, dto: TaskListUpdateTitleDTO): Observable<TaskListResponseDTO> {
+    return this.http.patch<TaskListResponseDTO>(`${this.apiUrl}/${id}/title/update`, dto);
+  }
+
+  /**
+   * Delete a task list
+   */
+  deleteList(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Duplicate a task list
+   * Creates a new list owned by the current user with all tasks from the original
+   */
+  duplicateList(id: number, dto: TaskListDuplicateDTO = {}): Observable<TaskListResponseDTO> {
+    return this.http.post<TaskListResponseDTO>(`${this.apiUrl}/${id}/duplicate`, dto);
   }
 }
