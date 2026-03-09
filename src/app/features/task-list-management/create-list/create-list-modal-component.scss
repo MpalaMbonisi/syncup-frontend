@@ -1,0 +1,206 @@
+@use "../../../../styles/variables" as v;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: v.$spacing-lg;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: v.$white;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-lg;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: v.$spacing-lg;
+  border-bottom: 1px solid v.$border-color;
+
+  .modal-title {
+    font-size: v.$font-xl;
+    font-weight: v.$font-bold;
+    color: v.$text-primary;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: v.$text-secondary;
+    cursor: pointer;
+    padding: v.$spacing-xs;
+    border-radius: v.$border-radius-sm;
+    transition: all v.$transition-fast;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: v.$background-light;
+      color: v.$text-primary;
+    }
+
+    svg {
+      display: block;
+    }
+  }
+}
+
+.modal-body {
+  padding: v.$spacing-lg;
+
+  .error-box {
+    background-color: #fee;
+    border: 1px solid v.$error-color;
+    color: v.$error-color;
+    padding: v.$spacing-md;
+    border-radius: v.$border-radius-md;
+    margin-bottom: v.$spacing-lg;
+    font-size: v.$font-sm;
+  }
+
+  .form-group {
+    margin-bottom: v.$spacing-lg;
+
+    label {
+      display: block;
+      font-size: v.$font-sm;
+      font-weight: v.$font-medium;
+      color: v.$text-primary;
+      margin-bottom: v.$spacing-xs;
+    }
+
+    input {
+      width: 100%;
+      padding: v.$spacing-sm v.$spacing-md;
+      font-size: v.$font-md;
+      border: 1px solid v.$border-color;
+      border-radius: v.$border-radius-md;
+      transition: all v.$transition-fast;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: v.$primary-color;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      &.error {
+        border-color: v.$error-color;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+      }
+
+      &::placeholder {
+        color: v.$text-secondary;
+      }
+    }
+
+    .field-error {
+      color: v.$error-color;
+      font-size: v.$font-sm;
+      margin-top: v.$spacing-xs;
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: v.$spacing-md;
+    justify-content: flex-end;
+
+    button {
+      padding: v.$spacing-sm v.$spacing-lg;
+      font-size: v.$font-md;
+      font-weight: v.$font-semibold;
+      border: none;
+      border-radius: v.$border-radius-md;
+      cursor: pointer;
+      transition: all v.$transition-fast;
+
+      &.cancel-btn {
+        color: v.$text-secondary;
+        background-color: v.$background-light;
+        border: 1px solid v.$border-color;
+
+        &:hover {
+          background-color: #e5e7eb;
+        }
+      }
+
+      &.create-btn {
+        color: v.$white;
+        background-color: v.$primary-color;
+
+        &:hover:not(:disabled) {
+          background-color: v.$primary-hover;
+        }
+
+        &:disabled {
+          background-color: v.$border-color;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: v.$spacing-md;
+  }
+
+  .modal-header {
+    padding: v.$spacing-md;
+  }
+
+  .modal-body {
+    padding: v.$spacing-md;
+
+    .modal-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

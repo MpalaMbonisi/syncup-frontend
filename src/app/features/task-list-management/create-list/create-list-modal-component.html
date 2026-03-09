@@ -1,0 +1,81 @@
+@if (isOpen) {
+<div
+  class="modal-overlay"
+  (click)="onBackdropClick()"
+  (keydown.enter)="onBackdropClick()"
+  (keydown.space)="onBackdropClick()"
+  (keydown.escape)="onBackdropClick()"
+  role="button"
+  aria-label="Close modal backdrop"
+  tabindex="0"
+>
+  <div
+    class="modal-content"
+    (click)="onModalContentClick($event)"
+    (keydown)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    tabindex="-1"
+  >
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 id="modal-title" class="modal-title">Create New Task List</h2>
+      <button class="close-btn" (click)="close()" type="button" aria-label="Close modal">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Error Message -->
+      @if (errorMessage) {
+      <div class="error-box">{{ errorMessage }}</div>
+      }
+
+      <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="listTitle">List Title *</label>
+          <input
+            id="listTitle"
+            type="text"
+            formControlName="title"
+            placeholder="e.g., Shopping List, Work Tasks"
+            [class.error]="listForm.get('title')?.invalid && listForm.get('title')?.touched"
+          />
+          @if (listForm.get('title')?.invalid && listForm.get('title')?.touched) {
+          <div class="field-error">
+            @if (listForm.get('title')?.errors?.['required']) {
+            <span>Title is required</span>
+            } @if (listForm.get('title')?.errors?.['maxlength']) {
+            <span>Title cannot exceed {{ maxTitleLength }} characters</span>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="close()">Cancel</button>
+          <button type="submit" class="create-btn" [disabled]="listForm.invalid || isLoading">
+            {{ isLoading ? 'Creating...' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}
