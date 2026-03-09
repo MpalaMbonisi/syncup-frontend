@@ -1,6 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaskListResponseDTO, TaskListService, TaskListUpdateTitleDTO } from './task-list-service';
+import {
+  TaskListDuplicateDTO,
+  TaskListResponseDTO,
+  TaskListService,
+  TaskListUpdateTitleDTO,
+} from './task-list-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient } from '@angular/common/http';
@@ -412,6 +417,193 @@ describe('TaskListService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}`);
       req.flush(mockError, { status: 403, statusText: 'Forbidden' });
+    });
+  });
+
+  describe('duplicateList', () => {
+    it('should duplicate a task list with default title', () => {
+      const listId = 1;
+      const mockResponse: TaskListResponseDTO = {
+        id: 4,
+        title: 'Shopping List (Copy)',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [
+          {
+            id: 10,
+            description: 'Buy milk',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+          {
+            id: 11,
+            description: 'Buy bread',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+        ],
+      };
+
+      service.duplicateList(listId).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.id).toBe(4);
+        expect(response.title).toBe('Shopping List (Copy)');
+        expect(response.owner).toBe('johndoe');
+        expect(response.tasks.length).toBe(2);
+        expect(response.collaborators.length).toBe(0); // Collaborators not copied
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      req.flush(mockResponse);
+    });
+
+    it('should duplicate a task list with custom title', () => {
+      const listId = 1;
+      const dto: TaskListDuplicateDTO = { newTitle: 'My Custom Copy' };
+      const mockResponse: TaskListResponseDTO = {
+        id: 4,
+        title: 'My Custom Copy',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      service.duplicateList(listId, dto).subscribe(response => {
+        expect(response.title).toBe('My Custom Copy');
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      expect(req.request.body).toEqual(dto);
+      req.flush(mockResponse);
+    });
+
+    it('should handle duplicating empty list', () => {
+      const listId = 2;
+      const mockResponse: TaskListResponseDTO = {
+        id: 5,
+        title: 'Empty List (Copy)',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      service.duplicateList(listId).subscribe(response => {
+        expect(response.tasks.length).toBe(0);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockResponse);
+    });
+
+    it('should create list owned by current user when duplicating as collaborator', () => {
+      const listId = 1;
+      const mockResponse: TaskListResponseDTO = {
+        id: 4,
+        title: 'Shopping List (Copy)',
+        owner: 'janedoe', // Different from original owner
+        collaborators: [],
+        tasks: [
+          {
+            id: 10,
+            description: 'Buy milk',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+        ],
+      };
+
+      service.duplicateList(listId).subscribe(response => {
+        expect(response.owner).toBe('janedoe'); // New owner is the duplicator
+        expect(response.collaborators.length).toBe(0); // No collaborators on duplicate
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockResponse);
+    });
+
+    it('should reset task completion status to false', () => {
+      const listId = 1;
+      const mockResponse: TaskListResponseDTO = {
+        id: 4,
+        title: 'Shopping List (Copy)',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [
+          {
+            id: 10,
+            description: 'Buy milk',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+          {
+            id: 11,
+            description: 'Buy bread',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+        ],
+      };
+
+      service.duplicateList(listId).subscribe(response => {
+        response.tasks.forEach(task => {
+          expect(task.completed).toBe(false);
+        });
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 404 error when list not found', () => {
+      const listId = 999;
+      const mockError = { message: 'List not found' };
+
+      service.duplicateList(listId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle 400 error for invalid title', () => {
+      const listId = 1;
+      const dto: TaskListDuplicateDTO = { newTitle: '' };
+      const mockError = { message: 'Title cannot be empty' };
+
+      service.duplicateList(listId, dto).subscribe({
+        next: () => fail('should have failed with 400 error'),
+        error: error => {
+          expect(error.status).toBe(400);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockError, { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('should handle 409 error for duplicate title', () => {
+      const listId = 1;
+      const dto: TaskListDuplicateDTO = { newTitle: 'Existing List' };
+      const mockError = { message: 'A list with this title already exists' };
+
+      service.duplicateList(listId, dto).subscribe({
+        next: () => fail('should have failed with 409 error'),
+        error: error => {
+          expect(error.status).toBe(409);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/duplicate`);
+      req.flush(mockError, { status: 409, statusText: 'Conflict' });
     });
   });
 });
