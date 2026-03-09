@@ -205,4 +205,35 @@ describe('ViewListComponent', () => {
       expect(mockTaskService.createTask).not.toHaveBeenCalled();
     });
   });
+
+  describe('Task Completion Toggle', () => {
+    it('should toggle task status when checkbox is clicked', () => {
+      const updatedTask = { ...mockList.tasks![0], completed: true };
+      mockTaskService.updateTaskStatus.mockReturnValue(of(updatedTask));
+
+      component.toggleTaskStatus(mockList.tasks![0]);
+
+      expect(mockTaskService.updateTaskStatus).toHaveBeenCalledWith(1, 1, { completed: true });
+    });
+
+    it('should update task in list after toggle', () => {
+      const task = mockList.tasks![0];
+      const updatedTask = { ...task, completed: true };
+      mockTaskService.updateTaskStatus.mockReturnValue(of(updatedTask));
+
+      component.toggleTaskStatus(task);
+
+      expect(component.list!.tasks![0].completed).toBe(true);
+    });
+
+    it('should toggle from completed to incomplete', () => {
+      const task = mockList.tasks![1]; // completed task
+      const updatedTask = { ...task, completed: false };
+      mockTaskService.updateTaskStatus.mockReturnValue(of(updatedTask));
+
+      component.toggleTaskStatus(task);
+
+      expect(mockTaskService.updateTaskStatus).toHaveBeenCalledWith(1, 2, { completed: false });
+    });
+  });
 });
