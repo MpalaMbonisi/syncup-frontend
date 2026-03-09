@@ -4,6 +4,7 @@ import { LoginComponent } from './features/auth/login-component/login-component'
 import { ROUTES } from './core/constants/app.constants';
 import { DashboardComponent } from './features/dashboard/dashboard-component';
 import { authGuard } from './core/guards/auth-guard';
+import { ViewListComponent } from './features/task-list-management/view-list/view-list-component';
 
 export const routes: Routes = [
   // redirect empty path to login
@@ -17,6 +18,11 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'list/:id',
+    component: ViewListComponent,
     canActivate: [authGuard],
   },
 
