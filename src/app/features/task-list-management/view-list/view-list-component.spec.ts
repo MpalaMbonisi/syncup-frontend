@@ -115,4 +115,27 @@ describe('ViewListComponent', () => {
       expect(badge).toBeTruthy();
     });
   });
+
+  describe('Task Display', () => {
+    it('should display all tasks', () => {
+      const taskItems = fixture.nativeElement.querySelectorAll('.task-item');
+      expect(taskItems.length).toBe(2);
+    });
+
+    it('should show completed task with strikethrough', () => {
+      const completedTask = fixture.nativeElement.querySelectorAll('.task-item')[1];
+      expect(completedTask.classList.contains('completed')).toBe(true);
+    });
+
+    it('should show incomplete task without strikethrough', () => {
+      const incompleteTask = fixture.nativeElement.querySelectorAll('.task-item')[0];
+      expect(incompleteTask.classList.contains('completed')).toBe(false);
+    });
+
+    it('should display task descriptions', () => {
+      const taskDescriptions = fixture.nativeElement.querySelectorAll('.task-description');
+      expect(taskDescriptions[0].textContent).toContain('Buy milk');
+      expect(taskDescriptions[1].textContent).toContain('Buy bread');
+    });
+  });
 });
