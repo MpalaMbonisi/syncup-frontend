@@ -395,4 +395,38 @@ describe('ViewListComponent', () => {
       expect(component.errorMessage).toBe('Failed to create task');
     });
   });
+
+  describe('Empty State', () => {
+    it('should show empty state when no tasks', () => {
+      component.list = { ...mockList, tasks: [] };
+      fixture.detectChanges();
+
+      const emptyState = fixture.nativeElement.querySelector('.empty-tasks-state');
+      expect(emptyState).toBeTruthy();
+    });
+
+    it('should show "Add your first task" message in empty state', () => {
+      component.list = { ...mockList, tasks: [] };
+      fixture.detectChanges();
+
+      const emptyState = fixture.nativeElement.querySelector('.empty-tasks-state');
+      expect(emptyState.textContent).toContain('No tasks yet');
+    });
+  });
+
+  describe('Task Statistics', () => {
+    it('should display task completion stats', () => {
+      const stats = fixture.nativeElement.querySelector('.task-stats');
+      expect(stats.textContent).toContain('1 of 2 completed');
+    });
+
+    it('should calculate progress percentage', () => {
+      expect(component.getProgressPercentage()).toBe(50);
+    });
+
+    it('should show 0% progress when no tasks', () => {
+      component.list = { ...mockList, tasks: [] };
+      expect(component.getProgressPercentage()).toBe(0);
+    });
+  });
 });
