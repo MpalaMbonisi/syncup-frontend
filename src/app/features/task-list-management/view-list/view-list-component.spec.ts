@@ -61,6 +61,8 @@ describe('ViewListComponent', () => {
       snapshot: { params: { id: '1' } },
     };
 
+    const freshMockList = JSON.parse(JSON.stringify(mockList));
+
     await TestBed.configureTestingModule({
       imports: [ViewListComponent],
       providers: [
@@ -73,10 +75,11 @@ describe('ViewListComponent', () => {
       ],
     }).compileComponents();
 
-    mockTaskListService.getListById.mockReturnValue(of(mockList));
+    mockTaskListService.getListById.mockReturnValue(of(freshMockList));
 
     fixture = TestBed.createComponent(ViewListComponent);
     component = fixture.componentInstance;
+    component.list = freshMockList;
     fixture.detectChanges();
   });
 
@@ -234,6 +237,41 @@ describe('ViewListComponent', () => {
       component.toggleTaskStatus(task);
 
       expect(mockTaskService.updateTaskStatus).toHaveBeenCalledWith(1, 2, { completed: false });
+    });
+  });
+
+  describe('Task Deletion', () => {
+    it('should show delete button for each task', () => {
+      const deleteButtons = fixture.nativeElement.querySelectorAll('.delete-task-btn');
+      expect(deleteButtons.length).toBe(2);
+    });
+
+    it('should delete task when delete button is clicked', () => {
+      mockTaskService.deleteTask.mockReturnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+      component.deleteTask(mockList.tasks![0]);
+
+      expect(mockTaskService.deleteTask).toHaveBeenCalledWith(1, 1);
+    });
+
+    it('should remove task from list after deletion', () => {
+      mockTaskService.deleteTask.mockReturnValue(of(undefined));
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+      const initialLength = component.list!.tasks!.length;
+      component.deleteTask(mockList.tasks![0]);
+
+      expect(component.list!.tasks!.length).toBe(initialLength - 1);
+    });
+
+    it('should show confirmation dialog before deleting', () => {
+      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+      component.deleteTask(mockList.tasks![0]);
+
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(mockTaskService.deleteTask).not.toHaveBeenCalled();
     });
   });
 });
