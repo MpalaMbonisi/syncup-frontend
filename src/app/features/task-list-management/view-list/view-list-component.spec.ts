@@ -80,6 +80,7 @@ describe('ViewListComponent', () => {
     fixture = TestBed.createComponent(ViewListComponent);
     component = fixture.componentInstance;
     component.list = freshMockList;
+    component.currentUsername = 'johndoe';
     fixture.detectChanges();
   });
 
@@ -272,6 +273,61 @@ describe('ViewListComponent', () => {
 
       expect(confirmSpy).toHaveBeenCalled();
       expect(mockTaskService.deleteTask).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Edit List Title', () => {
+    it('should have edit title button', () => {
+      const editButton = fixture.nativeElement.querySelector('.edit-title-btn');
+      expect(editButton).toBeTruthy();
+    });
+
+    it('should show edit mode when edit button is clicked', () => {
+      component.startEditingTitle();
+
+      expect(component.isEditingTitle).toBe(true);
+    });
+
+    it('should display input when in edit mode', () => {
+      component.startEditingTitle();
+      fixture.detectChanges();
+
+      const input = fixture.nativeElement.querySelector('.edit-title-input');
+      expect(input).toBeTruthy();
+    });
+
+    it('should update title when saved', () => {
+      const updatedList = { ...mockList, title: 'Updated Shopping List' };
+      mockTaskListService.updateListTitle.mockReturnValue(of(updatedList));
+
+      component.startEditingTitle();
+      component.editedTitle = 'Updated Shopping List';
+      component.saveTitle();
+
+      expect(mockTaskListService.updateListTitle).toHaveBeenCalledWith(1, {
+        title: 'Updated Shopping List',
+      });
+      expect(component.list!.title).toBe('Updated Shopping List');
+    });
+
+    it('should exit edit mode after saving', () => {
+      const updatedList = { ...mockList, title: 'Updated Shopping List' };
+      mockTaskListService.updateListTitle.mockReturnValue(of(updatedList));
+
+      component.startEditingTitle();
+      component.editedTitle = 'Updated Shopping List';
+      component.saveTitle();
+
+      expect(component.isEditingTitle).toBe(false);
+    });
+
+    it('should cancel editing without saving', () => {
+      component.startEditingTitle();
+      component.editedTitle = 'Changed Title';
+      component.cancelEditingTitle();
+
+      expect(component.isEditingTitle).toBe(false);
+      expect(component.list!.title).toBe('Shopping List');
     });
   });
 });
