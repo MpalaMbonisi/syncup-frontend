@@ -462,4 +462,28 @@ describe('CreateListModalComponent', () => {
       expect(component.isOpen).toBe(true);
     });
   });
+
+  describe('Close Button', () => {
+    it('should close modal when close button is clicked', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const closeButton = fixture.debugElement.query(By.css('.close-btn'));
+      closeButton.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+  });
+
+  describe('Cancel Button', () => {
+    it('should close modal when cancel button is clicked', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const cancelButton = fixture.debugElement.query(By.css('.cancel-btn'));
+      cancelButton.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+  });
 });
