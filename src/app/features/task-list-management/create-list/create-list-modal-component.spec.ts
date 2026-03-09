@@ -8,7 +8,7 @@ describe('CreateListModalComponent', () => {
   let component: CreateListModalComponent;
   let fixture: ComponentFixture<CreateListModalComponent>;
   let mockTaskListService: { createList: jest.Mock };
-  // let compiled: HTMLElement;
+  let compiled: HTMLElement;
 
   beforeEach(async () => {
     mockTaskListService = {
@@ -22,7 +22,7 @@ describe('CreateListModalComponent', () => {
 
     fixture = TestBed.createComponent(CreateListModalComponent);
     component = fixture.componentInstance;
-    // compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     fixture.detectChanges();
   });
 
@@ -44,6 +44,52 @@ describe('CreateListModalComponent', () => {
     });
 
     it('should initialize with no error message', () => {
+      expect(component.errorMessage).toBe('');
+    });
+  });
+
+  describe('Modal Visibility', () => {
+    it('should not display modal when isOpen is false', () => {
+      const modal = compiled.querySelector('.modal-overlay');
+      expect(modal).toBeNull();
+    });
+
+    it('should display modal when isOpen is true', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const modal = compiled.querySelector('.modal-overlay');
+      expect(modal).toBeTruthy();
+    });
+
+    it('should open modal when open() is called', () => {
+      expect(component.isOpen).toBe(false);
+
+      component.open();
+
+      expect(component.isOpen).toBe(true);
+    });
+
+    it('should close modal when close() is called', () => {
+      component.open();
+      expect(component.isOpen).toBe(true);
+
+      component.close();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should reset form when modal is closed', () => {
+      component.listForm.patchValue({ title: 'Test Title' });
+      component.close();
+
+      expect(component.listForm.get('title')?.value).toBeNull();
+    });
+
+    it('should clear error message when modal is closed', () => {
+      component.errorMessage = 'Test error';
+      component.close();
+
       expect(component.errorMessage).toBe('');
     });
   });
