@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
 import { VALIDATION } from '../../../core/constants/app.constants';
 import { of, Subject, throwError } from 'rxjs';
+import { By } from '@angular/platform-browser';
 
 describe('CreateListModalComponent', () => {
   let component: CreateListModalComponent;
@@ -433,6 +434,31 @@ describe('CreateListModalComponent', () => {
       component.listForm.patchValue({ title: 'Test Title' });
       component.onSubmit();
 
+      expect(component.isOpen).toBe(true);
+    });
+  });
+
+  describe('Backdrop Click', () => {
+    it('should close modal when backdrop is clicked', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const backdrop = fixture.debugElement.query(By.css('.modal-overlay'));
+      backdrop.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should not close modal when modal content is clicked', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const event = new MouseEvent('click');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+      component.onModalContentClick(event);
+
+      expect(stopPropagationSpy).toHaveBeenCalled();
       expect(component.isOpen).toBe(true);
     });
   });
