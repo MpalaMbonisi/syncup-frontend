@@ -4,7 +4,7 @@ import { CreateListModalComponent } from './create-list-modal-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
 import { VALIDATION } from '../../../core/constants/app.constants';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 describe('CreateListModalComponent', () => {
   let component: CreateListModalComponent;
@@ -369,6 +369,71 @@ describe('CreateListModalComponent', () => {
       component.onSubmit();
 
       expect(component.isLoading).toBe(false);
+    });
+  });
+
+  describe('Failed Creation', () => {
+    beforeEach(() => {
+      component.open();
+      fixture.detectChanges();
+    });
+
+    it('should display error message on failure', () => {
+      mockTaskListService.createList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Title already exists' } }))
+      );
+
+      component.listForm.patchValue({ title: 'Duplicate Title' });
+      component.onSubmit();
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBe('Title already exists');
+
+      const errorBox = compiled.querySelector('.error-box');
+      expect(errorBox).toBeTruthy();
+      expect(errorBox!.textContent).toContain('Title already exists');
+    });
+
+    it('should handle array of error messages', () => {
+      mockTaskListService.createList.mockReturnValue(
+        throwError(() => ({ error: { message: ['Error 1', 'Error 2'] } }))
+      );
+
+      component.listForm.patchValue({ title: 'Test Title' });
+      component.onSubmit();
+
+      expect(component.errorMessage).toBe('Error 1, Error 2');
+    });
+
+    it('should display generic error message when error format is unexpected', () => {
+      mockTaskListService.createList.mockReturnValue(throwError(() => ({ status: 500 })));
+
+      component.listForm.patchValue({ title: 'Test Title' });
+      component.onSubmit();
+
+      expect(component.errorMessage).toBe('Failed to create list. Please try again.');
+    });
+
+    it('should reset loading state on error', () => {
+      mockTaskListService.createList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Error' } }))
+      );
+
+      component.listForm.patchValue({ title: 'Test Title' });
+      component.onSubmit();
+
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should not close modal on error', () => {
+      mockTaskListService.createList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Error' } }))
+      );
+
+      component.listForm.patchValue({ title: 'Test Title' });
+      component.onSubmit();
+
+      expect(component.isOpen).toBe(true);
     });
   });
 });
