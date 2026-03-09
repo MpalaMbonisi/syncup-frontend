@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateListModalComponent } from './create-list-modal-component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TaskListService } from '../../../core/services/task-list-service';
+import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
 import { VALIDATION } from '../../../core/constants/app.constants';
+import { of, Subject } from 'rxjs';
 
 describe('CreateListModalComponent', () => {
   let component: CreateListModalComponent;
@@ -233,6 +234,80 @@ describe('CreateListModalComponent', () => {
       const createButton = compiled.querySelector('.create-btn');
 
       expect(createButton!.textContent).toContain('Creating...');
+    });
+  });
+
+  describe('Form Submission', () => {
+    beforeEach(() => {
+      component.open();
+      fixture.detectChanges();
+    });
+
+    it('should not submit when form is invalid', () => {
+      component.listForm.patchValue({ title: '' });
+
+      component.onSubmit();
+
+      expect(mockTaskListService.createList).not.toHaveBeenCalled();
+    });
+
+    it('should call taskListService.createList with correct data', () => {
+      mockTaskListService.createList.mockReturnValue(
+        of({
+          id: 1,
+          title: 'New List',
+          owner: 'nicolesmith',
+          collaborators: [],
+          tasks: [],
+        })
+      );
+
+      component.listForm.patchValue({ title: 'New List' });
+
+      component.onSubmit();
+
+      expect(mockTaskListService.createList).toHaveBeenCalledWith({ title: 'New List' });
+    });
+
+    it('should set loading state during submission', () => {
+      const createListSubject = new Subject<TaskListResponseDTO>();
+      mockTaskListService.createList.mockReturnValue(createListSubject.asObservable());
+
+      component.listForm.patchValue({ title: 'New List' });
+
+      expect(component.isLoading).toBe(false);
+
+      component.onSubmit();
+
+      expect(component.isLoading).toBe(true);
+
+      createListSubject.next({
+        id: 1,
+        title: 'New List',
+        owner: 'nicolesmith',
+        collaborators: [],
+        tasks: [],
+      });
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should clear error message on submit', () => {
+      mockTaskListService.createList.mockReturnValue(
+        of({
+          id: 1,
+          title: 'New List',
+          owner: 'nicolesmith',
+          collaborators: [],
+          tasks: [],
+        })
+      );
+
+      component.errorMessage = 'Previous error';
+      component.listForm.patchValue({ title: 'New List' });
+
+      component.onSubmit();
+
+      expect(component.errorMessage).toBe('');
     });
   });
 });
