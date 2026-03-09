@@ -194,4 +194,45 @@ describe('CreateListModalComponent', () => {
       );
     });
   });
+
+  describe('Submit Button State', () => {
+    beforeEach(() => {
+      component.open();
+      fixture.detectChanges();
+    });
+
+    it('should be disabled when form is invalid', () => {
+      const createButton = compiled.querySelector('.create-btn') as HTMLButtonElement;
+
+      expect(createButton.disabled).toBe(true);
+    });
+
+    it('should be enabled when form is valid', () => {
+      component.listForm.patchValue({ title: 'Valid Title' });
+      fixture.detectChanges();
+
+      const createButton = compiled.querySelector('.create-btn') as HTMLButtonElement;
+
+      expect(createButton.disabled).toBe(false);
+    });
+
+    it('should be disabled when loading', () => {
+      component.listForm.patchValue({ title: 'Valid Title' });
+      component.isLoading = true;
+      fixture.detectChanges();
+
+      const createButton = compiled.querySelector('.create-btn') as HTMLButtonElement;
+
+      expect(createButton.disabled).toBe(true);
+    });
+
+    it('should display "Creating..." text when loading', () => {
+      component.isLoading = true;
+      fixture.detectChanges();
+
+      const createButton = compiled.querySelector('.create-btn');
+
+      expect(createButton!.textContent).toContain('Creating...');
+    });
+  });
 });
