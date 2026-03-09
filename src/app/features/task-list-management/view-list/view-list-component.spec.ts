@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ViewListComponent } from './view-list-component';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
 import { TaskService } from '../../../core/services/task-service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -355,6 +355,44 @@ describe('ViewListComponent', () => {
 
       expect(mockTaskListService.deleteList).toHaveBeenCalledWith(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
+    });
+  });
+
+  describe('Back to Dashboard', () => {
+    it('should have back button', () => {
+      const backButton = fixture.nativeElement.querySelector('.back-btn');
+      expect(backButton).toBeTruthy();
+    });
+
+    it('should navigate to dashboard when back button is clicked', () => {
+      component.goBack();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.DASHBOARD]);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should display error message when loading list fails', () => {
+      mockTaskListService.getListById.mockReturnValue(
+        throwError(() => ({ error: { message: 'List not found' } }))
+      );
+
+      fixture = TestBed.createComponent(ViewListComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBeTruthy();
+    });
+
+    it('should handle task creation error', () => {
+      mockTaskService.createTask.mockReturnValue(
+        throwError(() => ({ error: { message: 'Failed to create task' } }))
+      );
+
+      component.newTaskDescription = 'Buy eggs';
+      component.addTask();
+
+      expect(component.errorMessage).toBe('Failed to create task');
     });
   });
 });
