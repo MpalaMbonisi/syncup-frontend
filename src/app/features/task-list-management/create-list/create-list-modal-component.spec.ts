@@ -310,4 +310,65 @@ describe('CreateListModalComponent', () => {
       expect(component.errorMessage).toBe('');
     });
   });
+
+  describe('Successful Creation', () => {
+    beforeEach(() => {
+      component.open();
+      fixture.detectChanges();
+    });
+
+    it('should emit listCreated event on success', done => {
+      const mockResponse = {
+        id: 1,
+        title: 'New List',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      mockTaskListService.createList.mockReturnValue(of(mockResponse));
+
+      component.listCreated.subscribe(list => {
+        expect(list).toEqual(mockResponse);
+        done();
+      });
+
+      component.listForm.patchValue({ title: 'New List' });
+      component.onSubmit();
+    });
+
+    it('should close modal on success', () => {
+      mockTaskListService.createList.mockReturnValue(
+        of({
+          id: 1,
+          title: 'New List',
+          owner: 'johndoe',
+          collaborators: [],
+          tasks: [],
+        })
+      );
+
+      component.listForm.patchValue({ title: 'New List' });
+      component.onSubmit();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should reset loading state on success', () => {
+      mockTaskListService.createList.mockReturnValue(
+        of({
+          id: 1,
+          title: 'New List',
+          owner: 'johndoe',
+          collaborators: [],
+          tasks: [],
+        })
+      );
+
+      component.listForm.patchValue({ title: 'New List' });
+      component.onSubmit();
+
+      expect(component.isLoading).toBe(false);
+    });
+  });
 });
