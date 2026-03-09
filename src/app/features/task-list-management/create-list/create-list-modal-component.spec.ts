@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateListModalComponent } from './create-list-modal-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskListService } from '../../../core/services/task-list-service';
+import { VALIDATION } from '../../../core/constants/app.constants';
 
 describe('CreateListModalComponent', () => {
   let component: CreateListModalComponent;
@@ -132,6 +133,65 @@ describe('CreateListModalComponent', () => {
 
       expect(createButton).toBeTruthy();
       expect(createButton!.textContent).toContain('Create');
+    });
+  });
+
+  describe('Form Validation', () => {
+    it('should be invalid when title is empty', () => {
+      const titleControl = component.listForm.get('title');
+
+      expect(titleControl?.valid).toBe(false);
+      expect(titleControl?.errors?.['required']).toBe(true);
+    });
+
+    it('should be invalid when title exceeds max length', () => {
+      const titleControl = component.listForm.get('title');
+      const longTitle = 'a'.repeat(VALIDATION.TITLE_MAX_LENGTH + 1);
+
+      titleControl?.setValue(longTitle);
+
+      expect(titleControl?.valid).toBe(false);
+      expect(titleControl?.errors?.['maxlength']).toBeTruthy();
+    });
+
+    it('should be valid with proper title', () => {
+      const titleControl = component.listForm.get('title');
+      titleControl?.setValue('My Shopping List');
+
+      expect(titleControl?.valid).toBe(true);
+    });
+
+    it('should display error message when field is touched and invalid', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const titleControl = component.listForm.get('title');
+      titleControl?.markAsTouched();
+      fixture.detectChanges();
+
+      const errorMessage = compiled.querySelector('.field-error');
+
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage!.textContent).toContain('Title is required');
+    });
+
+    it('should display max length error when exceeded', () => {
+      component.open();
+      fixture.detectChanges();
+
+      const titleControl = component.listForm.get('title');
+      const longTitle = 'a'.repeat(VALIDATION.TITLE_MAX_LENGTH + 1);
+
+      titleControl?.setValue(longTitle);
+      titleControl?.markAsTouched();
+      fixture.detectChanges();
+
+      const errorMessage = compiled.querySelector('.field-error');
+
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage!.textContent).toContain(
+        `Title cannot exceed ${VALIDATION.TITLE_MAX_LENGTH} characters`
+      );
     });
   });
 });
