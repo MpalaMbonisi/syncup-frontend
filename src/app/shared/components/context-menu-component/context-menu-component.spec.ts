@@ -288,4 +288,70 @@ describe('ContextMenuComponent', () => {
       expect(menu.classList.contains('position-top')).toBe(true);
     });
   });
+
+  describe('Conditional Visibility', () => {
+    it('should hide items where visible is false', () => {
+      const itemsWithVisibility: MenuItem[] = [
+        { id: '1', label: 'Item 1', icon: 'icon', action: jest.fn(), visible: true },
+        { id: '2', label: 'Item 2', icon: 'icon', action: jest.fn(), visible: false },
+        { id: '3', label: 'Item 3', icon: 'icon', action: jest.fn() }, // no visible prop
+      ];
+
+      component.menuItems = itemsWithVisibility;
+      component.toggle();
+      fixture.detectChanges();
+
+      const visibleItems = component.getVisibleItems();
+      expect(visibleItems.length).toBe(2);
+      expect(visibleItems[0].id).toBe('1');
+      expect(visibleItems[1].id).toBe('3');
+    });
+
+    it('should only render visible items', () => {
+      const itemsWithVisibility: MenuItem[] = [
+        { id: '1', label: 'Item 1', icon: 'icon', action: jest.fn(), visible: true },
+        { id: '2', label: 'Item 2', icon: 'icon', action: jest.fn(), visible: false },
+        { id: '3', label: 'Item 3', icon: 'icon', action: jest.fn() },
+      ];
+
+      component.menuItems = itemsWithVisibility;
+      component.toggle();
+      fixture.detectChanges();
+
+      const menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      expect(menuItems.length).toBe(2);
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    beforeEach(() => {
+      component.toggle();
+      fixture.detectChanges();
+    });
+
+    it('should close menu when Escape key is pressed', () => {
+      expect(component.isOpen).toBe(true);
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(event);
+
+      expect(component.isOpen).toBe(false);
+    });
+  });
+
+  describe('Dynamic Menu Items', () => {
+    it('should update when menu items change', () => {
+      component.toggle();
+      fixture.detectChanges();
+
+      let menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      expect(menuItems.length).toBe(4);
+
+      component.menuItems = [mockMenuItems[0], mockMenuItems[1]];
+      fixture.detectChanges();
+
+      menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      expect(menuItems.length).toBe(2);
+    });
+  });
 });
