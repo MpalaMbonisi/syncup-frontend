@@ -138,4 +138,39 @@ describe('ContextMenuComponent', () => {
       expect(stopPropagationSpy).toHaveBeenCalled();
     });
   });
+
+  describe('Menu Items Display', () => {
+    beforeEach(() => {
+      component.toggle();
+      fixture.detectChanges();
+    });
+
+    it('should display all visible menu items', () => {
+      const menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      expect(menuItems.length).toBe(4);
+    });
+
+    it('should display menu item labels', () => {
+      const menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      expect(menuItems[0].textContent).toContain('View Details');
+      expect(menuItems[1].textContent).toContain('Edit Title');
+      expect(menuItems[2].textContent).toContain('Share List');
+      expect(menuItems[3].textContent).toContain('Delete List');
+    });
+
+    it('should display menu item icons', () => {
+      const menuItems = fixture.nativeElement.querySelectorAll('.menu-item svg');
+      expect(menuItems.length).toBe(4);
+    });
+
+    it('should apply danger class to danger items', () => {
+      const deleteItem = fixture.nativeElement.querySelectorAll('.menu-item')[3];
+      expect(deleteItem.classList.contains('danger')).toBe(true);
+    });
+
+    it('should apply disabled state to disabled items', () => {
+      const shareItem = fixture.nativeElement.querySelectorAll('.menu-item')[2];
+      expect(shareItem.classList.contains('disabled')).toBe(true);
+    });
+  });
 });
