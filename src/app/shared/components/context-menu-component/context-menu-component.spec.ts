@@ -173,4 +173,64 @@ describe('ContextMenuComponent', () => {
       expect(shareItem.classList.contains('disabled')).toBe(true);
     });
   });
+
+  describe('Menu Item Actions', () => {
+    beforeEach(() => {
+      component.toggle();
+      fixture.detectChanges();
+    });
+
+    it('should call action when menu item is clicked', () => {
+      const menuItem = fixture.debugElement.queryAll(By.css('.menu-item'))[0];
+      menuItem.nativeElement.click();
+
+      expect(mockMenuItems[0].action).toHaveBeenCalled();
+    });
+
+    it('should emit itemClicked event with item id', done => {
+      component.itemClicked.subscribe(id => {
+        expect(id).toBe('view');
+        done();
+      });
+
+      const menuItem = fixture.debugElement.queryAll(By.css('.menu-item'))[0];
+      menuItem.nativeElement.click();
+    });
+
+    it('should close menu after item is clicked', () => {
+      const menuItem = fixture.debugElement.queryAll(By.css('.menu-item'))[0];
+
+      expect(component.isOpen).toBe(true);
+
+      menuItem.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should not call action for disabled items', () => {
+      const disabledItem = fixture.debugElement.queryAll(By.css('.menu-item'))[2];
+      disabledItem.nativeElement.click();
+
+      expect(mockMenuItems[2].action).not.toHaveBeenCalled();
+    });
+
+    it('should not close menu when disabled item is clicked', () => {
+      const disabledItem = fixture.debugElement.queryAll(By.css('.menu-item'))[2];
+
+      expect(component.isOpen).toBe(true);
+
+      disabledItem.nativeElement.click();
+
+      expect(component.isOpen).toBe(true);
+    });
+
+    it('should stop event propagation when item is clicked', () => {
+      const event = new MouseEvent('click');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+      component.onItemClick(mockMenuItems[0], event);
+
+      expect(stopPropagationSpy).toHaveBeenCalled();
+    });
+  });
 });
