@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ContextMenuComponent, MenuItem } from './context-menu-component';
+import { By } from '@angular/platform-browser';
 
 describe('ContextMenuComponent', () => {
   let component: ContextMenuComponent;
@@ -102,6 +103,39 @@ describe('ContextMenuComponent', () => {
       });
 
       component.toggle();
+    });
+  });
+
+  describe('Menu Button', () => {
+    it('should render trigger button', () => {
+      const button = fixture.nativeElement.querySelector('.menu-trigger');
+      expect(button).toBeTruthy();
+    });
+
+    it('should have three dots icon', () => {
+      const svg = fixture.nativeElement.querySelector('.menu-trigger svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('should toggle menu when button is clicked', () => {
+      const button = fixture.debugElement.query(By.css('.menu-trigger'));
+
+      expect(component.isOpen).toBe(false);
+
+      button.nativeElement.click();
+      expect(component.isOpen).toBe(true);
+
+      button.nativeElement.click();
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should stop event propagation when clicked', () => {
+      const event = new MouseEvent('click');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+      component.onTriggerClick(event);
+
+      expect(stopPropagationSpy).toHaveBeenCalled();
     });
   });
 });
