@@ -61,4 +61,47 @@ describe('ContextMenuComponent', () => {
       expect(menu).toBeNull();
     });
   });
+
+  describe('Menu Toggle', () => {
+    it('should open menu when toggle is called', () => {
+      component.toggle();
+      expect(component.isOpen).toBe(true);
+    });
+
+    it('should close menu when toggle is called twice', () => {
+      component.toggle();
+      expect(component.isOpen).toBe(true);
+
+      component.toggle();
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should display menu when open', () => {
+      component.toggle();
+      fixture.detectChanges();
+
+      const menu = fixture.nativeElement.querySelector('.menu-dropdown');
+      expect(menu).toBeTruthy();
+    });
+
+    it('should emit opened event when menu opens', done => {
+      component.opened.subscribe(() => {
+        expect(component.isOpen).toBe(true);
+        done();
+      });
+
+      component.toggle();
+    });
+
+    it('should emit closed event when menu closes', done => {
+      component.isOpen = true;
+
+      component.closed.subscribe(() => {
+        expect(component.isOpen).toBe(false);
+        done();
+      });
+
+      component.toggle();
+    });
+  });
 });
