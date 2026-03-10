@@ -233,4 +233,59 @@ describe('ContextMenuComponent', () => {
       expect(stopPropagationSpy).toHaveBeenCalled();
     });
   });
+
+  describe('Click Outside', () => {
+    beforeEach(() => {
+      component.toggle();
+      fixture.detectChanges();
+    });
+
+    it('should close menu when clicking outside', () => {
+      expect(component.isOpen).toBe(true);
+
+      // Simulate click outside
+      document.body.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should not close menu when clicking inside', () => {
+      const menu = fixture.debugElement.query(By.css('.menu-dropdown'));
+
+      expect(component.isOpen).toBe(true);
+
+      menu.nativeElement.click();
+
+      expect(component.isOpen).toBe(true);
+    });
+  });
+
+  describe('Menu Position', () => {
+    it('should support left alignment', () => {
+      component.position = 'left';
+      component.toggle();
+      fixture.detectChanges();
+
+      const menu = fixture.nativeElement.querySelector('.menu-dropdown');
+      expect(menu.classList.contains('position-left')).toBe(true);
+    });
+
+    it('should support right alignment (default)', () => {
+      component.position = 'right';
+      component.toggle();
+      fixture.detectChanges();
+
+      const menu = fixture.nativeElement.querySelector('.menu-dropdown');
+      expect(menu.classList.contains('position-right')).toBe(true);
+    });
+
+    it('should support top alignment', () => {
+      component.position = 'top';
+      component.toggle();
+      fixture.detectChanges();
+
+      const menu = fixture.nativeElement.querySelector('.menu-dropdown');
+      expect(menu.classList.contains('position-top')).toBe(true);
+    });
+  });
 });
