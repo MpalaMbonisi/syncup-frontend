@@ -354,4 +354,41 @@ describe('ContextMenuComponent', () => {
       expect(menuItems.length).toBe(2);
     });
   });
+
+  describe('Accessibility', () => {
+    it('should have proper ARIA attributes on trigger button', () => {
+      const button = fixture.nativeElement.querySelector('.menu-trigger');
+
+      expect(button.getAttribute('aria-label')).toBe('Open menu');
+      expect(button.getAttribute('aria-haspopup')).toBe('true');
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('should update aria-expanded when menu opens', () => {
+      const button = fixture.nativeElement.querySelector('.menu-trigger');
+
+      component.toggle();
+      fixture.detectChanges();
+
+      expect(button.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('should have role="menu" on dropdown', () => {
+      component.toggle();
+      fixture.detectChanges();
+
+      const menu = fixture.nativeElement.querySelector('.menu-dropdown');
+      expect(menu.getAttribute('role')).toBe('menu');
+    });
+
+    it('should have role="menuitem" on items', () => {
+      component.toggle();
+      fixture.detectChanges();
+
+      const menuItems = fixture.nativeElement.querySelectorAll('.menu-item');
+      menuItems.forEach((item: HTMLElement) => {
+        expect(item.getAttribute('role')).toBe('menuitem');
+      });
+    });
+  });
 });
