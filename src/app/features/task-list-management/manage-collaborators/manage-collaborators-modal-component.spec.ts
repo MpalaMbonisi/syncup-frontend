@@ -247,4 +247,113 @@ describe('ManageCollaboratorsModalComponent', () => {
       expect(ownerBadge?.textContent).toContain('Owner');
     });
   });
+
+  describe('Add Collaborator', () => {
+    beforeEach(() => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of([]));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+    });
+
+    it('should not add when form is invalid', () => {
+      component.collaboratorForm.patchValue({ username: '' });
+
+      component.addCollaborator();
+
+      expect(mockCollaboratorsService.addCollaborators).not.toHaveBeenCalled();
+    });
+
+    it('should call service with correct data', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        of({ message: 'Collaborator added' })
+      );
+
+      component.collaboratorForm.patchValue({ username: 'janedoe' });
+      component.addCollaborator();
+
+      expect(mockCollaboratorsService.addCollaborators).toHaveBeenCalledWith(1, {
+        collaborators: ['janedoe'],
+      });
+    });
+
+    it('should add collaborator to list on success', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        of({ message: 'Collaborator added' })
+      );
+
+      component.collaboratorForm.patchValue({ username: 'janedoe' });
+      component.addCollaborator();
+
+      expect(component.collaborators).toContain('janedoe');
+    });
+
+    it('should clear form after adding', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        of({ message: 'Collaborator added' })
+      );
+
+      component.collaboratorForm.patchValue({ username: 'janedoe' });
+      component.addCollaborator();
+
+      expect(component.collaboratorForm.get('username')?.value).toBeNull();
+    });
+
+    it('should emit collaboratorsUpdated event', done => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        of({ message: 'Collaborator added' })
+      );
+
+      component.collaboratorsUpdated.subscribe(collaborators => {
+        expect(collaborators).toContain('janedoe');
+        done();
+      });
+
+      component.collaboratorForm.patchValue({ username: 'janedoe' });
+      component.addCollaborator();
+    });
+
+    it('should display error when username does not exist', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        throwError(() => ({ error: { message: 'User does not exist' } }))
+      );
+
+      component.collaboratorForm.patchValue({ username: 'nonexistent' });
+      component.addCollaborator();
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBe('User does not exist');
+    });
+
+    it('should display error when user is already a collaborator', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        throwError(() => ({ error: { message: 'User is already a collaborator' } }))
+      );
+
+      component.collaboratorForm.patchValue({ username: 'janedoe' });
+      component.addCollaborator();
+
+      expect(component.errorMessage).toBe('User is already a collaborator');
+    });
+
+    it('should prevent adding owner as collaborator', () => {
+      component.collaboratorForm.patchValue({ username: 'johndoe' });
+      component.addCollaborator();
+
+      expect(mockCollaboratorsService.addCollaborators).not.toHaveBeenCalled();
+      expect(component.errorMessage).toBe('Cannot add the owner as a collaborator');
+    });
+
+    it('should trim whitespace from username', () => {
+      mockCollaboratorsService.addCollaborators.mockReturnValue(
+        of({ message: 'Collaborator added' })
+      );
+
+      component.collaboratorForm.patchValue({ username: '  janedoe  ' });
+      component.addCollaborator();
+
+      expect(mockCollaboratorsService.addCollaborators).toHaveBeenCalledWith(1, {
+        collaborators: ['janedoe'],
+      });
+    });
+  });
 });
