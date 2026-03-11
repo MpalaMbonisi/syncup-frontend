@@ -153,4 +153,35 @@ describe('ManageCollaboratorsModalComponent', () => {
       expect(closeButton).toBeTruthy();
     });
   });
+
+  describe('Form Validation', () => {
+    beforeEach(() => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of([]));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+    });
+
+    it('should be invalid when username is empty', () => {
+      const usernameControl = component.collaboratorForm.get('username');
+      expect(usernameControl?.valid).toBe(false);
+      expect(usernameControl?.errors?.['required']).toBe(true);
+    });
+
+    it('should be valid with proper username', () => {
+      const usernameControl = component.collaboratorForm.get('username');
+      usernameControl?.setValue('janedoe');
+
+      expect(usernameControl?.valid).toBe(true);
+    });
+
+    it('should display error message when field is touched and invalid', () => {
+      const usernameControl = component.collaboratorForm.get('username');
+      usernameControl?.markAsTouched();
+      fixture.detectChanges();
+
+      const errorMessage = compiled.querySelector('.field-error');
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage?.textContent).toContain('Username is required');
+    });
+  });
 });
