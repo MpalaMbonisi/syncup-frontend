@@ -4,6 +4,7 @@ import { ManageCollaboratorsModalComponent } from './manage-collaborators-modal-
 import { ReactiveFormsModule } from '@angular/forms';
 import { CollaboratorsService } from '../../../core/services/collaborators-service';
 import { of, throwError } from 'rxjs';
+import { By } from '@angular/platform-browser';
 
 describe('ManageCollaboratorsModalComponent', () => {
   let component: ManageCollaboratorsModalComponent;
@@ -422,6 +423,54 @@ describe('ManageCollaboratorsModalComponent', () => {
       component.removeCollaborator('janedoe');
 
       expect(component.errorMessage).toBe('Failed to remove');
+    });
+  });
+
+  describe('Empty State', () => {
+    it('should show empty state when no collaborators', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of([]));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+
+      const emptyState = compiled.querySelector('.empty-state');
+      expect(emptyState).toBeTruthy();
+      expect(emptyState?.textContent).toContain('No collaborators yet');
+    });
+
+    it('should not show empty state when collaborators exist', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+
+      const emptyState = compiled.querySelector('.empty-state');
+      expect(emptyState).toBeNull();
+    });
+  });
+
+  describe('Backdrop Click', () => {
+    it('should close modal when backdrop is clicked', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of([]));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+
+      const backdrop = fixture.debugElement.query(By.css('.modal-overlay'));
+      backdrop.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should not close when modal content is clicked', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of([]));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+
+      const event = new MouseEvent('click');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+      component.onModalContentClick(event);
+
+      expect(stopPropagationSpy).toHaveBeenCalled();
+      expect(component.isOpen).toBe(true);
     });
   });
 });
