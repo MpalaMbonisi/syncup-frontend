@@ -356,4 +356,72 @@ describe('ManageCollaboratorsModalComponent', () => {
       });
     });
   });
+
+  describe('Remove Collaborator', () => {
+    beforeEach(() => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+    });
+
+    it('should show confirmation dialog before removing', () => {
+      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+      component.removeCollaborator('janedoe');
+
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(mockCollaboratorsService.removeCollaborator).not.toHaveBeenCalled();
+    });
+
+    it('should call service when confirmed', () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockCollaboratorsService.removeCollaborator.mockReturnValue(
+        of({ message: 'Collaborator removed' })
+      );
+
+      component.removeCollaborator('janedoe');
+
+      expect(mockCollaboratorsService.removeCollaborator).toHaveBeenCalledWith(1, {
+        username: 'janedoe',
+      });
+    });
+
+    it('should remove collaborator from list on success', () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockCollaboratorsService.removeCollaborator.mockReturnValue(
+        of({ message: 'Collaborator removed' })
+      );
+
+      const initialLength = component.collaborators.length;
+      component.removeCollaborator('janedoe');
+
+      expect(component.collaborators.length).toBe(initialLength - 1);
+      expect(component.collaborators).not.toContain('janedoe');
+    });
+
+    it('should emit collaboratorsUpdated event', done => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockCollaboratorsService.removeCollaborator.mockReturnValue(
+        of({ message: 'Collaborator removed' })
+      );
+
+      component.collaboratorsUpdated.subscribe(collaborators => {
+        expect(collaborators).not.toContain('janedoe');
+        done();
+      });
+
+      component.removeCollaborator('janedoe');
+    });
+
+    it('should handle error when removal fails', () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockCollaboratorsService.removeCollaborator.mockReturnValue(
+        throwError(() => ({ error: { message: 'Failed to remove' } }))
+      );
+
+      component.removeCollaborator('janedoe');
+
+      expect(component.errorMessage).toBe('Failed to remove');
+    });
+  });
 });
