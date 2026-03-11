@@ -1,0 +1,422 @@
+@use "../../../../styles/variables" as v;
+
+// ============================================
+// Modal Overlay
+// ============================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: v.$spacing-lg;
+
+  @media (max-width: 768px) {
+    padding: v.$spacing-md;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// Modal Content
+// ============================================
+.modal-content {
+  background: v.$white;
+  border-radius: v.$border-radius-lg;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s ease-out;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Modal Header
+// ============================================
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: v.$spacing-lg;
+  border-bottom: 1px solid v.$border-color;
+
+  .modal-title {
+    font-size: v.$font-xl;
+    font-weight: v.$font-bold;
+    color: v.$text-primary;
+    margin: 0 0 4px 0;
+  }
+
+  .list-subtitle {
+    font-size: v.$font-sm;
+    color: v.$text-secondary;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: v.$text-secondary;
+    cursor: pointer;
+    padding: v.$spacing-xs;
+    border-radius: v.$border-radius-sm;
+    transition: all v.$transition-fast;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: v.$background-light;
+      color: v.$text-primary;
+    }
+  }
+}
+
+// ============================================
+// Modal Body
+// ============================================
+.modal-body {
+  padding: v.$spacing-lg;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    padding: v.$spacing-md;
+  }
+}
+
+// ============================================
+// Error Box
+// ============================================
+.error-box {
+  background: #fee;
+  border: 1px solid v.$error-color;
+  color: v.$error-color;
+  padding: v.$spacing-md;
+  border-radius: v.$border-radius-md;
+  margin-bottom: v.$spacing-lg;
+  font-size: v.$font-sm;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+// ============================================
+// Add Section
+// ============================================
+.add-section {
+  margin-bottom: v.$spacing-xl;
+
+  h3 {
+    font-size: v.$font-lg;
+    font-weight: v.$font-semibold;
+    color: v.$text-primary;
+    margin: 0 0 v.$spacing-md 0;
+  }
+
+  .form-group {
+    label {
+      display: block;
+      font-size: v.$font-sm;
+      font-weight: v.$font-medium;
+      color: v.$text-primary;
+      margin-bottom: v.$spacing-xs;
+    }
+
+    .input-group {
+      display: flex;
+      gap: v.$spacing-sm;
+
+      input {
+        flex: 1;
+        padding: v.$spacing-sm v.$spacing-md;
+        font-size: v.$font-md;
+        border: 1px solid v.$border-color;
+        border-radius: v.$border-radius-md;
+        transition: all v.$transition-fast;
+
+        &:focus {
+          outline: none;
+          border-color: v.$primary-color;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        &.error {
+          border-color: v.$error-color;
+        }
+
+        &::placeholder {
+          color: v.$text-secondary;
+        }
+      }
+
+      .add-btn {
+        padding: v.$spacing-sm v.$spacing-lg;
+        font-size: v.$font-md;
+        font-weight: v.$font-semibold;
+        color: v.$white;
+        background: v.$primary-color;
+        border: none;
+        border-radius: v.$border-radius-md;
+        cursor: pointer;
+        transition: all v.$transition-fast;
+        white-space: nowrap;
+
+        &:hover:not(:disabled) {
+          background: v.$primary-hover;
+        }
+
+        &:disabled {
+          background: v.$border-color;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .field-error {
+      color: v.$error-color;
+      font-size: v.$font-xs;
+      margin-top: v.$spacing-xs;
+    }
+  }
+}
+
+// ============================================
+// Collaborators Section
+// ============================================
+.collaborators-section {
+  h3 {
+    font-size: v.$font-lg;
+    font-weight: v.$font-semibold;
+    color: v.$text-primary;
+    margin: 0 0 v.$spacing-md 0;
+  }
+}
+
+// ============================================
+// Loading State
+// ============================================
+.loading-collaborators {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-xl;
+  color: v.$text-secondary;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(79, 70, 229, 0.1);
+    border-top-color: v.$primary-color;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: v.$spacing-md;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: v.$font-sm;
+  }
+}
+
+// ============================================
+// Empty State
+// ============================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-xl;
+  text-align: center;
+  background: v.$background-light;
+  border-radius: v.$border-radius-md;
+  border: 2px dashed v.$border-color;
+
+  svg {
+    color: v.$text-secondary;
+    opacity: 0.6;
+    margin-bottom: v.$spacing-md;
+  }
+
+  p {
+    font-size: v.$font-md;
+    font-weight: v.$font-semibold;
+    color: v.$text-primary;
+    margin: 0 0 v.$spacing-xs 0;
+  }
+
+  .empty-hint {
+    font-size: v.$font-sm;
+    color: v.$text-secondary;
+  }
+}
+
+// ============================================
+// Collaborators List
+// ============================================
+.collaborators-list {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-sm;
+  margin-bottom: v.$spacing-lg;
+
+  .collaborator-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: v.$spacing-md;
+    background: v.$background-light;
+    border: 1px solid v.$border-color;
+    border-radius: v.$border-radius-md;
+    transition: all v.$transition-fast;
+
+    &:hover {
+      background: #f3f4f6;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .collaborator-info {
+      display: flex;
+      align-items: center;
+      gap: v.$spacing-sm;
+
+      .collaborator-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, v.$primary-color, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: v.$white;
+        flex-shrink: 0;
+      }
+
+      .collaborator-username {
+        font-size: v.$font-md;
+        font-weight: v.$font-medium;
+        color: v.$text-primary;
+      }
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: v.$text-secondary;
+      cursor: pointer;
+      padding: v.$spacing-xs;
+      border-radius: v.$border-radius-sm;
+      transition: all v.$transition-fast;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background: #fee;
+        color: v.$error-color;
+      }
+    }
+  }
+}
+
+// ============================================
+// Owner Section
+// ============================================
+.owner-section {
+  padding-top: v.$spacing-md;
+  border-top: 1px solid v.$border-color;
+
+  .owner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-xs;
+    padding: v.$spacing-sm v.$spacing-md;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-radius: v.$border-radius-md;
+    font-size: v.$font-sm;
+    font-weight: v.$font-semibold;
+    color: #1e40af;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: #1e40af;
+    }
+
+    .owner-label {
+      padding-left: v.$spacing-xs;
+      border-left: 1px solid #93c5fd;
+      margin-left: v.$spacing-xs;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: v.$font-xs;
+    }
+  }
+}
+
+// ============================================
+// Responsive Design
+// ============================================
+@media (max-width: 768px) {
+  .add-section {
+    .form-group {
+      .input-group {
+        flex-direction: column;
+
+        .add-btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
