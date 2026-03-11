@@ -1,6 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AddCollaboratorsDTO, CollaboratorsService } from './collaborators-service';
+import {
+  AddCollaboratorsDTO,
+  CollaboratorsService,
+  RemoveCollaboratorDTO,
+} from './collaborators-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient } from '@angular/common/http';
@@ -147,6 +151,57 @@ describe('CollaboratorsService', () => {
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/collaborator/add`);
+      req.flush(mockError, { status: 403, statusText: 'Forbidden' });
+    });
+  });
+
+  describe('removeCollaborator', () => {
+    it('should remove a collaborator from a list', () => {
+      const listId = 1;
+      const dto: RemoveCollaboratorDTO = { username: 'janedoe' };
+      const mockResponse = { message: 'Collaborator removed successfully' };
+
+      service.removeCollaborator(listId, dto).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/collaborator/remove`);
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual(dto);
+      req.flush(mockResponse);
+    });
+
+    it('should handle 404 error when collaborator not found', () => {
+      const listId = 1;
+      const dto: RemoveCollaboratorDTO = { username: 'nonexistent' };
+      const mockError = { message: 'User nonexistent is not a collaborator' };
+
+      service.removeCollaborator(listId, dto).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: error => {
+          expect(error.status).toBe(404);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/collaborator/remove`);
+      req.flush(mockError, { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle 403 error when user is not the owner', () => {
+      const listId = 1;
+      const dto: RemoveCollaboratorDTO = { username: 'janedoe' };
+      const mockError = { message: 'You are not the owner of this list' };
+
+      service.removeCollaborator(listId, dto).subscribe({
+        next: () => fail('should have failed with 403 error'),
+        error: error => {
+          expect(error.status).toBe(403);
+          expect(error.error).toEqual(mockError);
+        },
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/list/${listId}/collaborator/remove`);
       req.flush(mockError, { status: 403, statusText: 'Forbidden' });
     });
   });
