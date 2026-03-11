@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ManageCollaboratorsModalComponent } from './manage-collaborators-modal-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CollaboratorsService } from '../../../core/services/collaborators-service';
+import { of } from 'rxjs';
 
 describe('ManageCollaboratorsModalComponent', () => {
   let component: ManageCollaboratorsModalComponent;
@@ -12,9 +13,9 @@ describe('ManageCollaboratorsModalComponent', () => {
     addCollaborators: jest.Mock;
     removeCollaborator: jest.Mock;
   };
-  // let compiled: HTMLElement;
+  let compiled: HTMLElement;
 
-  // const mockCollaborators = ['janedoe', 'bobsmith', 'alicejones'];
+  const mockCollaborators = ['janedoe', 'nicolesmith', 'alicejones'];
 
   beforeEach(async () => {
     mockCollaboratorsService = {
@@ -30,7 +31,7 @@ describe('ManageCollaboratorsModalComponent', () => {
 
     fixture = TestBed.createComponent(ManageCollaboratorsModalComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    compiled = fixture.nativeElement;
   });
 
   describe('Component Initialization', () => {
@@ -55,6 +56,66 @@ describe('ManageCollaboratorsModalComponent', () => {
     });
 
     it('should initialize with no error message', () => {
+      expect(component.errorMessage).toBe('');
+    });
+  });
+
+  describe('Modal Visibility', () => {
+    it('should not display modal when closed', () => {
+      fixture.detectChanges();
+      const modal = compiled.querySelector('.modal-overlay');
+      expect(modal).toBeNull();
+    });
+
+    it('should display modal when opened', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+
+      const modal = compiled.querySelector('.modal-overlay');
+      expect(modal).toBeTruthy();
+    });
+
+    it('should load collaborators when opened', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+
+      expect(mockCollaboratorsService.getAllCollaborators).toHaveBeenCalledWith(1);
+    });
+
+    it('should set list details when opened', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+
+      expect(component.listId).toBe(1);
+      expect(component.listTitle).toBe('Shopping List');
+      expect(component.ownerUsername).toBe('johndoe');
+    });
+
+    it('should close modal when close is called', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+      expect(component.isOpen).toBe(true);
+
+      component.close();
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should reset form when modal is closed', () => {
+      component.collaboratorForm.patchValue({ username: 'test' });
+      component.close();
+
+      expect(component.collaboratorForm.get('username')?.value).toBeNull();
+    });
+
+    it('should clear error message when modal is closed', () => {
+      component.errorMessage = 'Test error';
+      component.close();
+
       expect(component.errorMessage).toBe('');
     });
   });
