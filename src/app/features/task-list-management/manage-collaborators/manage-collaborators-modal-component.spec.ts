@@ -119,4 +119,38 @@ describe('ManageCollaboratorsModalComponent', () => {
       expect(component.errorMessage).toBe('');
     });
   });
+
+  describe('Template Rendering', () => {
+    beforeEach(() => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+    });
+
+    it('should display modal title with list name', () => {
+      const title = compiled.querySelector('.modal-title');
+      expect(title?.textContent).toContain('Manage Collaborators');
+    });
+
+    it('should display list title subtitle', () => {
+      const subtitle = compiled.querySelector('.list-subtitle');
+      expect(subtitle?.textContent).toContain('Shopping List');
+    });
+
+    it('should render username input field', () => {
+      const input = compiled.querySelector('#username');
+      expect(input).toBeTruthy();
+    });
+
+    it('should render add button', () => {
+      const button = compiled.querySelector('.add-btn');
+      expect(button).toBeTruthy();
+      expect(button?.textContent).toContain('Add');
+    });
+
+    it('should render close button', () => {
+      const closeButton = compiled.querySelector('.close-btn');
+      expect(closeButton).toBeTruthy();
+    });
+  });
 });
