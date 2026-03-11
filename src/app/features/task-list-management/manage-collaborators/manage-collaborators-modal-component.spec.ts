@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ManageCollaboratorsModalComponent } from './manage-collaborators-modal-component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CollaboratorsService } from '../../../core/services/collaborators-service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('ManageCollaboratorsModalComponent', () => {
   let component: ManageCollaboratorsModalComponent;
@@ -182,6 +182,69 @@ describe('ManageCollaboratorsModalComponent', () => {
       const errorMessage = compiled.querySelector('.field-error');
       expect(errorMessage).toBeTruthy();
       expect(errorMessage?.textContent).toContain('Username is required');
+    });
+  });
+
+  describe('Loading Collaborators', () => {
+    it('should display loading state while fetching', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+      component.isLoadingCollaborators = true;
+      fixture.detectChanges();
+
+      const loading = compiled.querySelector('.loading-collaborators');
+      expect(loading).toBeTruthy();
+    });
+
+    it('should populate collaborators list after loading', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+
+      component.open(1, 'Shopping List', 'johndoe');
+
+      expect(component.collaborators).toEqual(mockCollaborators);
+    });
+
+    it('should handle error when loading fails', () => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(
+        throwError(() => ({ error: { message: 'Failed to load' } }))
+      );
+
+      component.open(1, 'Shopping List', 'johndoe');
+
+      expect(component.errorMessage).toBe('Failed to load');
+    });
+  });
+
+  describe('Collaborators Display', () => {
+    beforeEach(() => {
+      mockCollaboratorsService.getAllCollaborators.mockReturnValue(of(mockCollaborators));
+      component.open(1, 'Shopping List', 'johndoe');
+      fixture.detectChanges();
+    });
+
+    it('should display all collaborators', () => {
+      const collaboratorItems = compiled.querySelectorAll('.collaborator-item');
+      expect(collaboratorItems.length).toBe(3);
+    });
+
+    it('should display collaborator usernames', () => {
+      const collaboratorItems = compiled.querySelectorAll('.collaborator-username');
+      expect(collaboratorItems[0].textContent).toContain('janedoe');
+      expect(collaboratorItems[1].textContent).toContain('nicolesmith');
+      expect(collaboratorItems[2].textContent).toContain('alicejones');
+    });
+
+    it('should show remove button for each collaborator', () => {
+      const removeButtons = compiled.querySelectorAll('.remove-btn');
+      expect(removeButtons.length).toBe(3);
+    });
+
+    it('should display owner badge', () => {
+      const ownerBadge = compiled.querySelector('.owner-badge');
+      expect(ownerBadge).toBeTruthy();
+      expect(ownerBadge?.textContent).toContain('johndoe');
+      expect(ownerBadge?.textContent).toContain('Owner');
     });
   });
 });
