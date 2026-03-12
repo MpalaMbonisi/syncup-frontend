@@ -166,4 +166,23 @@ describe('DuplicateListModalComponent', () => {
       expect(cancelButton).toBeTruthy();
     });
   });
+
+  describe('Suggested Title Generation', () => {
+    it('should suggest title with (Copy) suffix', () => {
+      component.open(mockOriginalList);
+      expect(component.suggestedTitle).toBe('Shopping List (Copy)');
+    });
+
+    it('should suggest title with (Copy 2) if already has (Copy)', () => {
+      const listWithCopy = { ...mockOriginalList, title: 'Shopping List (Copy)' };
+      component.open(listWithCopy);
+      expect(component.suggestedTitle).toBe('Shopping List (Copy 2)');
+    });
+
+    it('should increment copy number if already numbered', () => {
+      const listWithCopy2 = { ...mockOriginalList, title: 'Shopping List (Copy 2)' };
+      component.open(listWithCopy2);
+      expect(component.suggestedTitle).toBe('Shopping List (Copy 3)');
+    });
+  });
 });
