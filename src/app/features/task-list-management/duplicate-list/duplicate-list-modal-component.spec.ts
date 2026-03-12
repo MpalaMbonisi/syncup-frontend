@@ -111,4 +111,59 @@ describe('DuplicateListModalComponent', () => {
       expect(component.errorMessage).toBe('');
     });
   });
+
+  describe('Template Rendering', () => {
+    beforeEach(() => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+    });
+
+    it('should display modal title', () => {
+      const title = compiled.querySelector('.modal-title');
+      expect(title?.textContent).toContain('Duplicate List');
+    });
+
+    it('should display original list title in subtitle', () => {
+      const subtitle = compiled.querySelector('.original-list-name');
+      expect(subtitle?.textContent).toContain('Shopping List');
+    });
+
+    it('should display task count', () => {
+      const taskCount = compiled.querySelector('.info-item');
+      expect(taskCount?.textContent).toContain('2 tasks');
+    });
+
+    it('should display ownership info when duplicating as collaborator', () => {
+      component.currentUsername = 'janedoe'; // Collaborator, not owner
+      fixture.detectChanges();
+
+      const ownershipInfo = compiled.querySelector('.ownership-notice');
+      expect(ownershipInfo).toBeTruthy();
+      expect(ownershipInfo?.textContent).toContain('You will become the owner');
+    });
+
+    it('should not display ownership info when duplicating as owner', () => {
+      component.currentUsername = 'johndoe'; // Owner
+      fixture.detectChanges();
+
+      const ownershipInfo = compiled.querySelector('.ownership-notice');
+      expect(ownershipInfo).toBeNull();
+    });
+
+    it('should render title input field', () => {
+      const input = compiled.querySelector('#newTitle');
+      expect(input).toBeTruthy();
+    });
+
+    it('should render duplicate button', () => {
+      const button = compiled.querySelector('.duplicate-btn');
+      expect(button).toBeTruthy();
+      expect(button?.textContent).toContain('Duplicate');
+    });
+
+    it('should render cancel button', () => {
+      const cancelButton = compiled.querySelector('.cancel-btn');
+      expect(cancelButton).toBeTruthy();
+    });
+  });
 });
