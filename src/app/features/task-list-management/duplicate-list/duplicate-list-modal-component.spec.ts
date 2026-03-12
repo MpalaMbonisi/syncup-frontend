@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DuplicateListModalComponent } from './duplicate-list-modal-component';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
+import { of } from 'rxjs';
 
 describe('DuplicateListModalComponent', () => {
   let component: DuplicateListModalComponent;
@@ -19,6 +20,17 @@ describe('DuplicateListModalComponent', () => {
     tasks: [
       { id: 1, description: 'Buy milk', completed: false, taskListTitle: 'Shopping List' },
       { id: 2, description: 'Buy bread', completed: true, taskListTitle: 'Shopping List' },
+    ],
+  };
+
+  const mockDuplicatedList: TaskListResponseDTO = {
+    id: 4,
+    title: 'Shopping List (Copy)',
+    owner: 'johndoe',
+    collaborators: [],
+    tasks: [
+      { id: 10, description: 'Buy milk', completed: false, taskListTitle: 'Shopping List (Copy)' },
+      { id: 11, description: 'Buy bread', completed: false, taskListTitle: 'Shopping List (Copy)' },
     ],
   };
 
@@ -183,6 +195,89 @@ describe('DuplicateListModalComponent', () => {
       const listWithCopy2 = { ...mockOriginalList, title: 'Shopping List (Copy 2)' };
       component.open(listWithCopy2);
       expect(component.suggestedTitle).toBe('Shopping List (Copy 3)');
+    });
+  });
+
+  describe('Duplicate List Action', () => {
+    beforeEach(() => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+    });
+
+    it('should use suggested title when form is empty', () => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      component.duplicateList();
+
+      expect(mockTaskListService.duplicateList).toHaveBeenCalledWith(1, {});
+    });
+
+    it('should use custom title when provided', () => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      component.duplicateForm.patchValue({ newTitle: 'My Custom List' });
+      component.duplicateList();
+
+      expect(mockTaskListService.duplicateList).toHaveBeenCalledWith(1, {
+        newTitle: 'My Custom List',
+      });
+    });
+
+    it('should trim whitespace from custom title', () => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      component.duplicateForm.patchValue({ newTitle: '  My Custom List  ' });
+      component.duplicateList();
+
+      expect(mockTaskListService.duplicateList).toHaveBeenCalledWith(1, {
+        newTitle: 'My Custom List',
+      });
+    });
+
+    it('should emit listDuplicated event on success', done => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      component.listDuplicated.subscribe(newList => {
+        expect(newList).toEqual(mockDuplicatedList);
+        done();
+      });
+
+      component.duplicateList();
+    });
+
+    it('should close modal after successful duplication', () => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      component.duplicateList();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should set loading state during duplication', () => {
+      mockTaskListService.duplicateList.mockReturnValue(of(mockDuplicatedList));
+
+      expect(component.isLoading).toBe(false);
+
+      component.duplicateList();
+
+      // Loading is set to false after observable completes
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should disable button while loading', () => {
+      component.isLoading = true;
+      fixture.detectChanges();
+
+      const button = compiled.querySelector('.duplicate-btn') as HTMLButtonElement;
+      expect(button.disabled).toBe(true);
+    });
+
+    it('should show "Duplicating..." text while loading', () => {
+      component.isLoading = true;
+      fixture.detectChanges();
+
+      const button = compiled.querySelector('.duplicate-btn');
+      expect(button?.textContent).toContain('Duplicating...');
     });
   });
 });
