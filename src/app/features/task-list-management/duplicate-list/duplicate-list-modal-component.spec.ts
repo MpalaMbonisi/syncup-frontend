@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DuplicateListModalComponent } from './duplicate-list-modal-component';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('DuplicateListModalComponent', () => {
   let component: DuplicateListModalComponent;
@@ -278,6 +278,91 @@ describe('DuplicateListModalComponent', () => {
 
       const button = compiled.querySelector('.duplicate-btn');
       expect(button?.textContent).toContain('Duplicating...');
+    });
+  });
+
+  describe('Error Handling', () => {
+    beforeEach(() => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+    });
+
+    it('should display error when duplication fails', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Duplication failed' } }))
+      );
+
+      component.duplicateList();
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBe('Duplication failed');
+    });
+
+    it('should handle 404 error when list not found', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: 'List not found' } }))
+      );
+
+      component.duplicateList();
+
+      expect(component.errorMessage).toBe('List not found');
+    });
+
+    it('should handle 400 error for invalid title', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Title cannot be empty' } }))
+      );
+
+      component.duplicateList();
+
+      expect(component.errorMessage).toBe('Title cannot be empty');
+    });
+
+    it('should handle 409 error for duplicate title', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: 'A list with this title already exists' } }))
+      );
+
+      component.duplicateList();
+
+      expect(component.errorMessage).toBe('A list with this title already exists');
+    });
+
+    it('should handle array error messages', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: ['Error 1', 'Error 2'] } }))
+      );
+
+      component.duplicateList();
+
+      expect(component.errorMessage).toBe('Error 1, Error 2');
+    });
+
+    it('should show generic error for unknown errors', () => {
+      mockTaskListService.duplicateList.mockReturnValue(throwError(() => ({})));
+
+      component.duplicateList();
+
+      expect(component.errorMessage).toBe('Failed to duplicate list. Please try again.');
+    });
+
+    it('should not close modal when duplication fails', () => {
+      mockTaskListService.duplicateList.mockReturnValue(
+        throwError(() => ({ error: { message: 'Error' } }))
+      );
+
+      component.duplicateList();
+
+      expect(component.isOpen).toBe(true);
+    });
+
+    it('should display error box in template', () => {
+      component.errorMessage = 'Test error';
+      fixture.detectChanges();
+
+      const errorBox = compiled.querySelector('.error-box');
+      expect(errorBox).toBeTruthy();
+      expect(errorBox?.textContent).toContain('Test error');
     });
   });
 });
