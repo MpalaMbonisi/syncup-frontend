@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DuplicateListModalComponent } from './duplicate-list-modal-component';
 import { TaskListResponseDTO, TaskListService } from '../../../core/services/task-list-service';
 import { of, throwError } from 'rxjs';
+import { By } from '@angular/platform-browser';
 
 describe('DuplicateListModalComponent', () => {
   let component: DuplicateListModalComponent;
@@ -420,6 +421,47 @@ describe('DuplicateListModalComponent', () => {
       );
 
       expect(hasCollabNote).toBe(true);
+    });
+  });
+
+  describe('Backdrop Click', () => {
+    it('should close modal when backdrop is clicked', () => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+
+      const backdrop = fixture.debugElement.query(By.css('.modal-overlay'));
+      backdrop.nativeElement.click();
+
+      expect(component.isOpen).toBe(false);
+    });
+
+    it('should not close when modal content is clicked', () => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+
+      const event = new MouseEvent('click');
+      const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+      component.onModalContentClick(event);
+
+      expect(stopPropagationSpy).toHaveBeenCalled();
+      expect(component.isOpen).toBe(true);
+    });
+  });
+
+  describe('Ownership Detection', () => {
+    it('should detect when user is the owner', () => {
+      component.currentUsername = 'johndoe';
+      component.open(mockOriginalList);
+
+      expect(component.isOwner()).toBe(true);
+    });
+
+    it('should detect when user is a collaborator', () => {
+      component.currentUsername = 'janedoe';
+      component.open(mockOriginalList);
+
+      expect(component.isOwner()).toBe(false);
     });
   });
 });
