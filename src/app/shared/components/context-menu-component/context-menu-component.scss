@@ -35,7 +35,7 @@
 // ============================================
 .menu-dropdown {
   position: absolute;
-  z-index: 1000;
+  z-index: 1010;
   min-width: 200px;
   background: v.$white;
   border: 1px solid v.$border-color;
@@ -43,6 +43,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: v.$spacing-xs 0;
   animation: slideDown 0.15s ease-out;
+  top: 100%;
 
   // Position variants
   &.position-right {
@@ -63,6 +64,16 @@
   &.position-bottom {
     top: calc(100% + 4px);
     right: 0;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -10px; // Bridges a 10px gap
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: transparent;
   }
 }
 

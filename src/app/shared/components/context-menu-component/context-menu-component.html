@@ -1,12 +1,5 @@
-<div class="context-menu-container">
-  <!-- Trigger Button -->
-  <button
-    class="menu-trigger"
-    (click)="onTriggerClick($event)"
-    [attr.aria-label]="'Open menu'"
-    [attr.aria-haspopup]="'true'"
-    [attr.aria-expanded]="isOpen"
-  >
+<div class="context-menu-container" (mouseleave)="isOpen = false">
+  <button class="menu-trigger" (click)="onTriggerClick($event)" type="button" [attr.aria-expanded]="isOpen">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="20"

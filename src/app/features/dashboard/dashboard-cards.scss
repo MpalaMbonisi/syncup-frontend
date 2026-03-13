@@ -61,11 +61,17 @@
   backdrop-filter: blur(10px);
   border-radius: v.$border-radius-lg;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  // overflow: hidden;
   transition: all v.$transition-fast;
   border: 1px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+
+  &.menu-open {
+    z-index: 1001; // Higher than the menu's 1000 and other cards
+  }
 
   &:hover {
+    z-index: 1002;
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   }
