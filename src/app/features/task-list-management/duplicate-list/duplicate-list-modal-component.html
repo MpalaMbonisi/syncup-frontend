@@ -1,0 +1,190 @@
+@if (isOpen && originalList) {
+<div
+  class="modal-overlay"
+  (click)="onBackdropClick()"
+  (keydown.escape)="onBackdropClick()"
+  role="presentation"
+  tabindex="-1"
+>
+  <div
+    class="modal-content"
+    (click)="onModalContentClick($event)"
+    (keydown)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    tabindex="-1"
+  >
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-title" class="modal-title">Duplicate List</h2>
+        <p class="original-list-name">{{ originalList.title }}</p>
+      </div>
+      <button class="close-btn" (click)="close()" type="button" aria-label="Close modal">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Error Message -->
+      @if (errorMessage) {
+      <div class="error-box">{{ errorMessage }}</div>
+      }
+
+      <!-- List Information -->
+      <div class="info-section">
+        <div class="info-card">
+          <div class="info-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            @if (getTaskCount() === 0) {
+            <span>No tasks to copy</span>
+            } @else if (getTaskCount() === 1) {
+            <span>1 task will be copied</span>
+            } @else {
+            <span>{{ getTaskCount() }} tasks will be copied</span>
+            }
+          </div>
+
+          <div class="info-notes">
+            <div class="info-note">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>All tasks will be marked as incomplete</span>
+            </div>
+            <div class="info-note">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span>Collaborators will not be copied</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ownership Notice (only for collaborators) -->
+        @if (!isOwner()) {
+        <div class="ownership-notice">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+            />
+          </svg>
+          <div>
+            <strong>You will become the owner</strong>
+            <p>The duplicated list will be yours. The original owner and collaborators will not have access.</p>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Title Form -->
+      <div class="title-section">
+        <h3>New List Title</h3>
+        <form [formGroup]="duplicateForm" (ngSubmit)="duplicateList()">
+          <div class="form-group">
+            <label for="newTitle">Title (optional)</label>
+            <input
+              id="newTitle"
+              type="text"
+              formControlName="newTitle"
+              [placeholder]="suggestedTitle"
+              maxlength="100"
+            />
+            <p class="hint-text">Leave empty to use suggested title</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="button-group">
+            <button type="button" class="cancel-btn" (click)="close()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="duplicate-btn" [disabled]="isLoading">
+              @if (isLoading) {
+              <div class="button-spinner"></div>
+              <span>Duplicating...</span>
+              } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span>Duplicate List</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+}

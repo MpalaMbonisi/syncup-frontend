@@ -1,0 +1,354 @@
+@use "../../../../styles/variables" as v;
+
+// ============================================
+// Modal Overlay
+// ============================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: v.$spacing-lg;
+
+  @media (max-width: 768px) {
+    padding: v.$spacing-md;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// Modal Content
+// ============================================
+.modal-content {
+  background: v.$white;
+  border-radius: v.$border-radius-lg;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 550px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s ease-out;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Modal Header
+// ============================================
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: v.$spacing-lg;
+  border-bottom: 1px solid v.$border-color;
+
+  .modal-title {
+    font-size: v.$font-xl;
+    font-weight: v.$font-bold;
+    color: v.$text-primary;
+    margin: 0 0 4px 0;
+  }
+
+  .original-list-name {
+    font-size: v.$font-sm;
+    color: v.$text-secondary;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: v.$text-secondary;
+    cursor: pointer;
+    padding: v.$spacing-xs;
+    border-radius: v.$border-radius-sm;
+    transition: all v.$transition-fast;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: v.$background-light;
+      color: v.$text-primary;
+    }
+  }
+}
+
+// ============================================
+// Modal Body
+// ============================================
+.modal-body {
+  padding: v.$spacing-lg;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    padding: v.$spacing-md;
+  }
+}
+
+// ============================================
+// Error Box
+// ============================================
+.error-box {
+  background: #fee;
+  border: 1px solid v.$error-color;
+  color: v.$error-color;
+  padding: v.$spacing-md;
+  border-radius: v.$border-radius-md;
+  margin-bottom: v.$spacing-lg;
+  font-size: v.$font-sm;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+// ============================================
+// Info Section
+// ============================================
+.info-section {
+  margin-bottom: v.$spacing-xl;
+
+  .info-card {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border: 1px solid v.$border-color;
+    border-radius: v.$border-radius-md;
+    padding: v.$spacing-md;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: v.$spacing-sm;
+      font-size: v.$font-md;
+      font-weight: v.$font-semibold;
+      color: v.$text-primary;
+      margin-bottom: v.$spacing-md;
+
+      svg {
+        color: v.$primary-color;
+        flex-shrink: 0;
+      }
+    }
+
+    .info-notes {
+      display: flex;
+      flex-direction: column;
+      gap: v.$spacing-xs;
+
+      .info-note {
+        display: flex;
+        align-items: flex-start;
+        gap: v.$spacing-xs;
+        font-size: v.$font-sm;
+        color: v.$text-secondary;
+
+        svg {
+          flex-shrink: 0;
+          margin-top: 2px;
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// Ownership Notice
+// ============================================
+.ownership-notice {
+  display: flex;
+  gap: v.$spacing-sm;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: v.$border-radius-md;
+  padding: v.$spacing-md;
+  margin-top: v.$spacing-md;
+
+  svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    display: block;
+    font-size: v.$font-md;
+    font-weight: v.$font-semibold;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: v.$font-sm;
+    color: #92400e;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// ============================================
+// Title Section
+// ============================================
+.title-section {
+  h3 {
+    font-size: v.$font-lg;
+    font-weight: v.$font-semibold;
+    color: v.$text-primary;
+    margin: 0 0 v.$spacing-md 0;
+  }
+
+  .form-group {
+    margin-bottom: v.$spacing-lg;
+
+    label {
+      display: block;
+      font-size: v.$font-sm;
+      font-weight: v.$font-medium;
+      color: v.$text-primary;
+      margin-bottom: v.$spacing-xs;
+    }
+
+    input {
+      width: 100%;
+      padding: v.$spacing-sm v.$spacing-md;
+      font-size: v.$font-md;
+      border: 1px solid v.$border-color;
+      border-radius: v.$border-radius-md;
+      transition: all v.$transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: v.$primary-color;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      &::placeholder {
+        color: v.$text-secondary;
+        font-style: italic;
+      }
+    }
+
+    .hint-text {
+      font-size: v.$font-xs;
+      color: v.$text-secondary;
+      margin: v.$spacing-xs 0 0 0;
+    }
+  }
+}
+
+// ============================================
+// Button Group
+// ============================================
+.button-group {
+  display: flex;
+  gap: v.$spacing-sm;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  button {
+    padding: v.$spacing-sm v.$spacing-lg;
+    font-size: v.$font-md;
+    font-weight: v.$font-semibold;
+    border: none;
+    border-radius: v.$border-radius-md;
+    cursor: pointer;
+    transition: all v.$transition-fast;
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-xs;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .cancel-btn {
+    color: v.$text-secondary;
+    background: v.$background-light;
+    border: 1px solid v.$border-color;
+
+    &:hover:not(:disabled) {
+      background: #e5e7eb;
+    }
+  }
+
+  .duplicate-btn {
+    color: v.$white;
+    background: v.$primary-color;
+
+    &:hover:not(:disabled) {
+      background: v.$primary-hover;
+    }
+
+    .button-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: v.$white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+}
