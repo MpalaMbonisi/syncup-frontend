@@ -371,4 +371,85 @@ describe('DashboardComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/list', 1]);
     });
   });
+
+  describe('Context Menu Items', () => {
+    beforeEach(() => {
+      component.username = 'Johndoe';
+    });
+
+    it('should generate context menu for owner', () => {
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+
+      expect(items).toHaveLength(5);
+      expect(items[0].id).toBe('view');
+      expect(items[1].id).toBe('edit');
+      expect(items[1].visible).toBe(true); // Owner can edit
+      expect(items[2].id).toBe('share');
+      expect(items[2].visible).toBe(true); // Owner can manage collaborators
+      expect(items[3].id).toBe('duplicate');
+      expect(items[4].id).toBe('delete');
+      expect(items[4].visible).toBe(true); // Owner can delete
+      expect(items[4].danger).toBe(true);
+    });
+
+    it('should generate context menu for collaborator', () => {
+      const items = component.getContextMenuItems(mockTaskLists[1]); // owned by janedoe
+
+      expect(items).toHaveLength(5);
+      expect(items[0].id).toBe('view');
+      expect(items[1].visible).toBe(false); // Collaborator cannot edit
+      expect(items[2].visible).toBe(false); // Collaborator cannot manage collaborators
+      expect(items[3].id).toBe('duplicate'); // Collaborator can duplicate
+      expect(items[4].visible).toBe(false); // Collaborator cannot delete
+    });
+
+    it('should call viewList when view details is clicked', () => {
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+      const viewItem = items.find(item => item.id === 'view');
+
+      viewItem?.action();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/list', 1]);
+    });
+
+    it('should call editListTitle when edit is clicked', () => {
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+      const editItem = items.find(item => item.id === 'edit');
+
+      editItem?.action();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/list', 1]);
+    });
+
+    it('should call manageCollaborators when share is clicked', () => {
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+      const shareItem = items.find(item => item.id === 'share');
+
+      shareItem?.action();
+
+      expect(mockManageCollaboratorsModal.open).toHaveBeenCalledWith(1, 'Shopping List', 'johndoe');
+    });
+
+    it('should call duplicateList when duplicate is clicked', () => {
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+      const duplicateItem = items.find(item => item.id === 'duplicate');
+
+      duplicateItem?.action();
+
+      expect(mockDuplicateListModal.open).toHaveBeenCalledWith(mockTaskLists[0]);
+    });
+
+    it('should call deleteList when delete is clicked', () => {
+      window.confirm = jest.fn(() => true);
+      mockTaskListService.deleteList.mockReturnValue(of(undefined));
+
+      const items = component.getContextMenuItems(mockTaskLists[0]);
+      const deleteItem = items.find(item => item.id === 'delete');
+
+      deleteItem?.action();
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(mockTaskListService.deleteList).toHaveBeenCalledWith(1);
+    });
+  });
 });
