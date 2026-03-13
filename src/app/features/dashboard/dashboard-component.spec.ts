@@ -555,4 +555,42 @@ describe('DashboardComponent', () => {
       expect(component.taskLists[0].collaborators).toEqual([]);
     });
   });
+
+  describe('Logout', () => {
+    it('should clear storage and navigate to login', () => {
+      component.logout();
+
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+  });
+
+  describe('Helper Methods', () => {
+    it('should capitalize first letter of username', () => {
+      mockStorageService.getItem.mockReturnValue('valid-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue({
+        ...mockUser,
+        username: 'johndoe',
+      });
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.ngOnInit();
+
+      expect(component.username).toBe('Johndoe');
+    });
+
+    it('should handle empty username', () => {
+      mockStorageService.getItem.mockReturnValue('valid-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue({
+        ...mockUser,
+        username: '',
+      });
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.ngOnInit();
+
+      expect(component.username).toBe('');
+    });
+  });
 });
