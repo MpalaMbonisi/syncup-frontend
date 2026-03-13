@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TaskListResponseDTO, TaskListService } from '../../core/services/task-list-service';
 import { Router } from '@angular/router';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { StorageService } from '../../core/services/storage-service';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('DashboardComponent', () => {
@@ -195,6 +195,60 @@ describe('DashboardComponent', () => {
       component.ngOnInit();
 
       expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+  });
+
+  describe('Load Task Lists', () => {
+    beforeEach(() => {
+      mockStorageService.getItem.mockReturnValue('valid-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockUser);
+    });
+
+    it('should load task lists successfully', () => {
+      mockTaskListService.getAllLists.mockReturnValue(of(mockTaskLists));
+
+      component.loadTaskLists();
+
+      expect(component.isLoading).toBe(false);
+      expect(component.taskLists).toEqual(mockTaskLists);
+      expect(component.errorMessage).toBe('');
+    });
+
+    it('should set loading state while fetching lists', () => {
+      mockTaskListService.getAllLists.mockReturnValue(of(mockTaskLists));
+
+      component.isLoading = false;
+      component.loadTaskLists();
+
+      expect(component.isLoading).toBe(false); // After subscription completes
+    });
+
+    it('should handle error when loading lists fails', () => {
+      const error = new HttpErrorResponse({ status: 500, statusText: 'Server Error' });
+      mockTaskListService.getAllLists.mockReturnValue(throwError(() => error));
+
+      component.loadTaskLists();
+
+      expect(component.isLoading).toBe(false);
+      expect(component.errorMessage).toBe('Failed to load task lists. Please try again.');
+    });
+
+    it('should logout on 401 error', () => {
+      const error = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
+      mockTaskListService.getAllLists.mockReturnValue(throwError(() => error));
+
+      component.loadTaskLists();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should handle empty task lists array', () => {
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.loadTaskLists();
+
+      expect(component.taskLists).toEqual([]);
+      expect(component.isLoading).toBe(false);
     });
   });
 });
