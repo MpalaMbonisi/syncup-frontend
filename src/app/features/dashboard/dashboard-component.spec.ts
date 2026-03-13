@@ -452,4 +452,51 @@ describe('DashboardComponent', () => {
       expect(mockTaskListService.deleteList).toHaveBeenCalledWith(1);
     });
   });
+
+  describe('Create List Modal', () => {
+    it('should open create list modal', () => {
+      component.createNewList();
+      expect(mockCreateListModal.open).toHaveBeenCalled();
+    });
+
+    it('should add new list to beginning of array when created', () => {
+      component.taskLists = [...mockTaskLists];
+      const newList: TaskListResponseDTO = {
+        id: 4,
+        title: 'New List',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [],
+      };
+
+      component.onListCreated(newList);
+
+      expect(component.taskLists[0]).toEqual(newList);
+      expect(component.taskLists.length).toBe(mockTaskLists.length + 1);
+    });
+  });
+
+  describe('Manage Collaborators Modal', () => {
+    beforeEach(() => {
+      // Create a fresh copy of the array so mutations don't leak
+      component.taskLists = [...mockTaskLists];
+      component.username = 'Johndoe';
+    });
+
+    it('should open manage collaborators modal with list details', () => {
+      component.manageCollaborators(mockTaskLists[0]);
+
+      expect(mockManageCollaboratorsModal.open).toHaveBeenCalledWith(1, 'Shopping List', 'johndoe');
+    });
+
+    it('should update list collaborators when changed', () => {
+      component.taskLists = [...mockTaskLists];
+      const updatedCollaborators = ['janedoe', 'bobsmith', 'newuser'];
+
+      component.onCollaboratorsUpdated(1, updatedCollaborators);
+
+      const updatedList = component.taskLists.find(l => l.id === 1);
+      expect(updatedList?.collaborators).toEqual(updatedCollaborators);
+    });
+  });
 });
