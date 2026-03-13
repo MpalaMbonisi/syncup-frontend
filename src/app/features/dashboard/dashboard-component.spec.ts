@@ -4,7 +4,7 @@ import { TaskListResponseDTO, TaskListService } from '../../core/services/task-l
 import { Router } from '@angular/router';
 import { JwtDecoderService } from '../../core/services/jwt-decoder-service';
 import { of } from 'rxjs';
-import { STORAGE_KEYS } from '../../core/constants/app.constants';
+import { ROUTES, STORAGE_KEYS } from '../../core/constants/app.constants';
 import { StorageService } from '../../core/services/storage-service';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -73,7 +73,7 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     mockTaskListService = {
-      getAllLists: jest.fn(),
+      getAllLists: jest.fn().mockReturnValue(of([])),
       deleteList: jest.fn(),
     };
 
@@ -149,6 +149,52 @@ describe('DashboardComponent', () => {
       expect(mockStorageService.getItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
       expect(mockJwtDecoder.getUserFromToken).toHaveBeenCalledWith('valid-token');
       expect(mockTaskListService.getAllLists).toHaveBeenCalled();
+    });
+  });
+
+  describe('User Authentication', () => {
+    it('should load user info from token', () => {
+      mockStorageService.getItem.mockReturnValue('valid-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockUser);
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.ngOnInit();
+
+      expect(component.username).toBe('Johndoe');
+      expect(component.isTokenExpired).toBe(false);
+      expect(mockStorageService.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.USER_DATA,
+        expect.any(String)
+      );
+    });
+
+    it('should logout if no token found', () => {
+      mockStorageService.getItem.mockReturnValue(null);
+
+      component.ngOnInit();
+
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
+      expect(mockStorageService.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should logout if token is expired', () => {
+      mockStorageService.getItem.mockReturnValue('expired-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue({ ...mockUser, isExpired: true });
+
+      component.ngOnInit();
+
+      expect(component.isTokenExpired).toBe(true);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
+    });
+
+    it('should logout if token decoding fails', () => {
+      mockStorageService.getItem.mockReturnValue('invalid-token');
+      mockJwtDecoder.getUserFromToken.mockReturnValue(null);
+
+      component.ngOnInit();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([ROUTES.LOGIN]);
     });
   });
 });
