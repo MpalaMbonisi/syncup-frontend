@@ -365,4 +365,61 @@ describe('DuplicateListModalComponent', () => {
       expect(errorBox?.textContent).toContain('Test error');
     });
   });
+
+  describe('List Information Display', () => {
+    beforeEach(() => {
+      component.open(mockOriginalList);
+      fixture.detectChanges();
+    });
+
+    it('should display task count correctly', () => {
+      const taskCount = compiled.querySelector('.info-item');
+      expect(taskCount?.textContent).toContain('2 tasks will be copied');
+    });
+
+    it('should display singular "task" for single task', () => {
+      const singleTaskList = {
+        ...mockOriginalList,
+        tasks: [{ id: 1, description: 'Task', completed: false, taskListTitle: 'List' }],
+      };
+      component.open(singleTaskList);
+      fixture.detectChanges();
+
+      const taskCount = compiled.querySelector('.info-item');
+      expect(taskCount?.textContent).toContain('1 task will be copied');
+    });
+
+    it('should indicate empty list', () => {
+      const emptyList = { ...mockOriginalList, tasks: [] };
+      component.open(emptyList);
+      fixture.detectChanges();
+
+      const taskCount = compiled.querySelector('.info-item');
+      expect(taskCount?.textContent).toContain('No tasks to copy');
+    });
+
+    it('should show that collaborators will not be copied', () => {
+      const infoNotes: NodeListOf<HTMLElement> =
+        fixture.nativeElement.querySelectorAll('.info-note');
+      const notesText = Array.from(infoNotes).map((n: HTMLElement) => n.textContent || '');
+
+      const hasCollabNote = notesText.some(text =>
+        text.includes('Collaborators will not be copied')
+      );
+
+      expect(hasCollabNote).toBe(true);
+    });
+
+    it('should show that tasks will be reset to incomplete', () => {
+      const infoNotes: NodeListOf<HTMLElement> =
+        fixture.nativeElement.querySelectorAll('.info-note');
+      const notesText = Array.from(infoNotes).map((n: HTMLElement) => n.textContent || '');
+
+      const hasCollabNote = notesText.some(text =>
+        text.includes('All tasks will be marked as incomplete')
+      );
+
+      expect(hasCollabNote).toBe(true);
+    });
+  });
 });
