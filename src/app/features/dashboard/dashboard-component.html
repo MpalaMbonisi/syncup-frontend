@@ -2,6 +2,9 @@
   <!-- Header Component -->
   <app-header-component [username]="username"></app-header-component>
 
+  <!-- Create List Modal -->
+  <app-create-list-modal-component (listCreated)="onListCreated($event)"></app-create-list-modal-component>
+
   <!-- Main Dashboard Content -->
   <main class="dashboard-main">
     <div class="dashboard-content">
@@ -292,23 +295,10 @@
                   }
                 </div>
               </div>
-              <button class="card-menu-btn" (click)="openListMenu(list)" title="Options">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="1" />
-                  <circle cx="12" cy="5" r="1" />
-                  <circle cx="12" cy="19" r="1" />
-                </svg>
-              </button>
+              <app-context-menu-component
+                [menuItems]="getContextMenuItems(list)"
+                position="left"
+              ></app-context-menu-component>
             </div>
 
             <!-- Card Body -->
@@ -330,7 +320,7 @@
                     <path d="M9 11l3 3L22 4" />
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                   </svg>
-                  <span>{{ getCompletedTaskCount(list) }} / {{ list.tasks.length }}</span>
+                  <span>{{ getCompletedTaskCount(list) }} / {{ (list.tasks || []).length }}</span>
                 </div>
                 @if (list.collaborators.length > 0) {
                 <div class="stat-item">
@@ -358,7 +348,7 @@
               </div>
 
               <!-- Progress Bar -->
-              @if (list.tasks.length > 0) {
+              @if (list.tasks && list.tasks.length > 0) {
               <div class="progress-container">
                 <div class="progress-bar">
                   <div
@@ -402,6 +392,15 @@
       </div>
     </div>
   </main>
+
+  <!-- Create List Modal -->
+  <app-create-list-modal-component (listCreated)="onListCreated($event)"></app-create-list-modal-component>
+
+  <!-- Manage Collaborators Modal -->
+  <app-manage-collaborators-modal-component></app-manage-collaborators-modal-component>
+
+  <!-- Duplicate List Modal -->
+  <app-duplicate-list-modal-component (listDuplicated)="onListDuplicated($event)"></app-duplicate-list-modal-component>
 
   <!-- Footer -->
   <app-footer-component></app-footer-component>
