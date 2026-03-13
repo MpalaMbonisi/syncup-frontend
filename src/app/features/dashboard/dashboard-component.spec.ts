@@ -251,4 +251,48 @@ describe('DashboardComponent', () => {
       expect(component.isLoading).toBe(false);
     });
   });
+
+  describe('Task Statistics', () => {
+    beforeEach(() => {
+      component.taskLists = mockTaskLists;
+    });
+
+    it('should calculate incomplete task count for a list', () => {
+      const count = component.getIncompleteTaskCount(mockTaskLists[0]);
+      expect(count).toBe(1); // Only 'Buy milk' is incomplete
+    });
+
+    it('should calculate completed task count for a list', () => {
+      const count = component.getCompletedTaskCount(mockTaskLists[0]);
+      expect(count).toBe(1); // Only 'Buy bread' is completed
+    });
+
+    it('should handle lists with null tasks array', () => {
+      const listWithNullTasks = {
+        ...mockTaskLists[0],
+        tasks: null as unknown as TaskListResponseDTO['tasks'],
+      };
+      const incompleteCount = component.getIncompleteTaskCount(listWithNullTasks);
+      const completedCount = component.getCompletedTaskCount(listWithNullTasks);
+
+      expect(incompleteCount).toBe(0);
+      expect(completedCount).toBe(0);
+    });
+
+    it('should calculate total completed tasks across all lists', () => {
+      const total = component.getTotalCompletedTasks();
+      expect(total).toBe(1); // 1 from Shopping List + 0 from others
+    });
+
+    it('should calculate total pending tasks across all lists', () => {
+      const total = component.getTotalPendingTasks();
+      expect(total).toBe(2); // 1 from Shopping List + 1 from Work Tasks
+    });
+
+    it('should calculate total collaborations (lists where user is not owner)', () => {
+      component.username = 'Johndoe';
+      const total = component.getTotalCollaborations();
+      expect(total).toBe(1);
+    });
+  });
 });
