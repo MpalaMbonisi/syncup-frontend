@@ -295,4 +295,80 @@ describe('DashboardComponent', () => {
       expect(total).toBe(1);
     });
   });
+
+  describe('Ownership Detection', () => {
+    beforeEach(() => {
+      component.username = 'Johndoe';
+    });
+
+    it('should detect when user is the owner', () => {
+      const isOwner = component.isOwner(mockTaskLists[0]); // owned by johndoe
+      expect(isOwner).toBe(true);
+    });
+
+    it('should detect when user is not the owner', () => {
+      const isOwner = component.isOwner(mockTaskLists[1]); // owned by janedoe
+      expect(isOwner).toBe(false);
+    });
+
+    it('should handle case-insensitive username comparison', () => {
+      component.username = 'JOHNDOE';
+      const isOwner = component.isOwner(mockTaskLists[0]);
+      expect(isOwner).toBe(true);
+    });
+  });
+
+  describe('View Mode', () => {
+    it('should default to grid view', () => {
+      expect(component.viewMode).toBe('grid');
+    });
+
+    it('should set view mode to list', () => {
+      component.setViewMode('list');
+      expect(component.viewMode).toBe('list');
+      expect(mockStorageService.setItem).toHaveBeenCalledWith('dashboardViewMode', 'list');
+    });
+
+    it('should set view mode to grid', () => {
+      component.setViewMode('grid');
+      expect(component.viewMode).toBe('grid');
+      expect(mockStorageService.setItem).toHaveBeenCalledWith('dashboardViewMode', 'grid');
+    });
+
+    it('should load saved view preference on init', () => {
+      mockStorageService.getItem.mockImplementation((key: string) => {
+        if (key === 'dashboardViewMode') return 'list';
+        if (key === STORAGE_KEYS.AUTH_TOKEN) return 'valid-token';
+        return null;
+      });
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockUser);
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.ngOnInit();
+
+      expect(component.viewMode).toBe('list');
+    });
+
+    it('should default to grid if no saved preference', () => {
+      mockStorageService.getItem.mockReturnValue(null);
+      mockJwtDecoder.getUserFromToken.mockReturnValue(mockUser);
+      mockTaskListService.getAllLists.mockReturnValue(of([]));
+
+      component.ngOnInit();
+
+      expect(component.viewMode).toBe('grid');
+    });
+  });
+
+  describe('Navigation', () => {
+    it('should navigate to list view', () => {
+      component.viewList(mockTaskLists[0]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/list', 1]);
+    });
+
+    it('should navigate to list view when editing title', () => {
+      component.editListTitle(mockTaskLists[0]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/list', 1]);
+    });
+  });
 });
