@@ -499,4 +499,60 @@ describe('DashboardComponent', () => {
       expect(updatedList?.collaborators).toEqual(updatedCollaborators);
     });
   });
+
+  describe('Duplicate List Modal', () => {
+    it('should open duplicate list modal with list data', () => {
+      component.duplicateList(mockTaskLists[0]);
+
+      expect(mockDuplicateListModal.open).toHaveBeenCalledWith(mockTaskLists[0]);
+    });
+
+    it('should add duplicated list to beginning of array', () => {
+      component.taskLists = mockTaskLists;
+      const duplicatedList: TaskListResponseDTO = {
+        id: 4,
+        title: 'Shopping List (Copy)',
+        owner: 'johndoe',
+        collaborators: [],
+        tasks: [
+          {
+            id: 10,
+            description: 'Buy milk',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+          {
+            id: 11,
+            description: 'Buy bread',
+            completed: false,
+            taskListTitle: 'Shopping List (Copy)',
+          },
+        ],
+      };
+
+      component.onListDuplicated(duplicatedList);
+
+      expect(component.taskLists[0]).toEqual(duplicatedList);
+      expect(component.taskLists.length).toBe(4);
+    });
+
+    it('should handle duplicating as collaborator (ownership transfer)', () => {
+      component.taskLists = mockTaskLists;
+      component.username = 'Janedoe';
+
+      // Original list owned by johndoe, janedoe duplicates it
+      const duplicatedList: TaskListResponseDTO = {
+        id: 4,
+        title: 'Shopping List (Copy)',
+        owner: 'janedoe', // Ownership transferred to duplicator
+        collaborators: [],
+        tasks: [],
+      };
+
+      component.onListDuplicated(duplicatedList);
+
+      expect(component.taskLists[0].owner).toBe('janedoe');
+      expect(component.taskLists[0].collaborators).toEqual([]);
+    });
+  });
 });
