@@ -33,102 +33,6 @@
         </button>
       </div>
 
-      <!-- Dashboard Stats -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon blue">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M3 3v18h18" />
-              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
-            </svg>
-          </div>
-          <div class="stat-info">
-            <p class="stat-label">Total Lists</p>
-            <p class="stat-value">{{ taskLists.length }}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon green">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <div class="stat-info">
-            <p class="stat-label">Completed Tasks</p>
-            <p class="stat-value">{{ getTotalCompletedTasks() }}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon orange">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-          </div>
-          <div class="stat-info">
-            <p class="stat-label">Pending Tasks</p>
-            <p class="stat-value">{{ getTotalPendingTasks() }}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon purple">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </div>
-          <div class="stat-info">
-            <p class="stat-label">Collaborations</p>
-            <p class="stat-value">{{ getTotalCollaborations() }}</p>
-          </div>
-        </div>
-      </div>
-
       <!-- Task Lists Section -->
       <div class="task-lists-section">
         <div class="section-header">
@@ -322,7 +226,7 @@
                   </svg>
                   <span>{{ getCompletedTaskCount(list) }} / {{ (list.tasks || []).length }}</span>
                 </div>
-                @if (list.collaborators.length > 0) {
+                @if ((list.collaborators ?? []).length > 0) {
                 <div class="stat-item">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -341,7 +245,8 @@
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                   <span
-                    >{{ list.collaborators.length }} collaborator{{ list.collaborators.length !== 1 ? 's' : '' }}</span
+                    >{{ (list.collaborators ?? []).length }} collaborator{{ (list.collaborators ?? []).length !== 1 ?
+                    's' : '' }}</span
                   >
                 </div>
                 }

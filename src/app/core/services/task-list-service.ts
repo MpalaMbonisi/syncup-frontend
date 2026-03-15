@@ -14,8 +14,8 @@ export interface TaskListResponseDTO {
   id: number;
   title: string;
   owner: string;
-  collaborators: string[];
-  tasks: TaskItemResponseDTO[];
+  collaborators: string[] | null;
+  tasks: TaskItemResponseDTO[] | null;
 }
 
 export interface TaskListCreateDTO {
