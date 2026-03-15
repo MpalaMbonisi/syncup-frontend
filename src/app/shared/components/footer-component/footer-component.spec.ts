@@ -59,7 +59,7 @@ describe('FooterComponent', () => {
     const compiled = fixture.nativeElement;
     const authorLink = compiled.querySelector('a');
 
-    expect(authorLink.getAttribute('href')).toBe('https://www.linkedin.com/in/mbonisi-mpala/');
+    expect(authorLink.getAttribute('href')).toBe('https://github.com/MpalaMbonisi');
   });
 
   it('should open link in new tab', () => {
