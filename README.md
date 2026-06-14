@@ -10,6 +10,12 @@ SyncUp Frontend is the client-side application for the SyncUp collaborative task
 
 ---
 
+## Demo
+
+![SyncUp Demo](docs/demo.gif)
+
+---
+
 ## Features
 
 ### Authentication
